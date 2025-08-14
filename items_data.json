@@ -1,0 +1,618 @@
+[
+    {
+        "Name": "Advanced Fremen Deathstill",
+        "Recipe": [
+            {
+                "Name": "Duraluminum Ingot",
+                "Count": 240
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 170
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 70
+            }
+        ]
+    },
+    {
+        "Name": "Advanced Garment Fabricator",
+        "Recipe": [
+            {
+                "Name": "Plastanium Ingot",
+                "Count": 140
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 180
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 100
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 45
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 150
+            },
+            {
+                "Name": "Armor Plating",
+                "Count": 115
+            }
+        ]
+    },
+    {
+        "Name": "Advanced Sub-Fief Console",
+        "Recipe": [
+            {
+                "Name": "Salvaged Metal",
+                "Count": 40
+            }
+        ]
+    },
+    {
+        "Name": "Advanced Survival Fabricator",
+        "Recipe": [
+            {
+                "Name": "Plastanium Ingot",
+                "Count": 140
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 180
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 100
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 45
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 150
+            },
+            {
+                "Name": "Thermoelectric Cooler",
+                "Count": 30
+            }
+        ]
+    },
+    {
+        "Name": "Advanced Vehicle Fabricator",
+        "Recipe": [
+            {
+                "Name": "Plastanium Ingot",
+                "Count": 140
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 180
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 100
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 45
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 150
+            },
+            {
+                "Name": "Industrial Pump",
+                "Count": 50
+            }
+        ]
+    },
+    {
+        "Name": "Advanced Weapons Fabricator",
+        "Recipe": [
+            {
+                "Name": "Plastanium Ingot",
+                "Count": 140
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 180
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 100
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 45
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 150
+            },
+            {
+                "Name": "Military Power Regulator",
+                "Count": 40
+            }
+        ]
+    },
+    {
+        "Name": "Blood Purifier",
+        "Recipe": [
+            {
+                "Name": "Salvaged Metal",
+                "Count": 70
+            }
+        ]
+    },
+    {
+        "Name": "Chest",
+        "Recipe": [
+            {
+                "Name": "Iron Ingot",
+                "Count": 20
+            }
+        ]
+    },
+    {
+        "Name": "Fabricator",
+        "Recipe": [
+            {
+                "Name": "Salvaged Metal",
+                "Count": 75
+            }
+        ]
+    },
+    {
+        "Name": "Fremen Deathstill",
+        "Recipe": [
+            {
+                "Name": "Steel Ingot",
+                "Count": 60
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 28
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 32
+            }
+        ]
+    },
+    {
+        "Name": "Garment Fabricator",
+        "Recipe": [
+            {
+                "Name": "Steel Ingot",
+                "Count": 40
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 30
+            }
+        ]
+    },
+    {
+        "Name": "Improved Blood Purifier",
+        "Recipe": [
+            {
+                "Name": "Iron Ingot",
+                "Count": 50
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 16
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 20
+            }
+        ]
+    },
+    {
+        "Name": "Large Ore Refinery",
+        "Recipe": [
+            {
+                "Name": "Plastanium Ingot",
+                "Count": 380
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 540
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 400
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 200
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 745
+            },
+            {
+                "Name": "Advanced Machinery",
+                "Count": 40
+            }
+        ]
+    },
+    {
+        "Name": "Large Spice Refinery",
+        "Recipe": [
+            {
+                "Name": "Plastanium Ingot",
+                "Count": 950
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 1080
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 350
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 1000
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 1110
+            },
+            {
+                "Name": "Advanced Machinery",
+                "Count": 55
+            }
+        ]
+    },
+    {
+        "Name": "Large Water Cistern",
+        "Recipe": [
+            {
+                "Name": "Duraluminum Ingot",
+                "Count": 150
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 160
+            },
+            {
+                "Name": "Industrial Pump",
+                "Count": 25
+            }
+        ]
+    },
+    {
+        "Name": "Large Windtrap",
+        "Recipe": [
+            {
+                "Name": "Duraluminum Ingot",
+                "Count": 240
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 250
+            },
+            {
+                "Name": "Calibrated Servok",
+                "Count": 70
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 5
+            }
+        ]
+    },
+    {
+        "Name": "Medium Chemical Refinery",
+        "Recipe": [
+            {
+                "Name": "Duraluminum Ingot",
+                "Count": 150
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 90
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 50
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 35
+            }
+        ]
+    },
+    {
+        "Name": "Medium Ore Refinery",
+        "Recipe": [
+            {
+                "Name": "Steel Ingot",
+                "Count": 125
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 60
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 50
+            }
+        ]
+    },
+    {
+        "Name": "Medium Spice Refinery",
+        "Recipe": [
+            {
+                "Name": "Plastanium Ingot",
+                "Count": 285
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 225
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 135
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 100
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 190
+            }
+        ]
+    },
+    {
+        "Name": "Medium Storage Container",
+        "Recipe": [
+            {
+                "Name": "Plastanium Ingot",
+                "Count": 70
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 14
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 4
+            }
+        ]
+    },
+    {
+        "Name": "Medium Water Cistern",
+        "Recipe": [
+            {
+                "Name": "Steel Ingot",
+                "Count": 60
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 30
+            }
+        ]
+    },
+    {
+        "Name": "Recycler",
+        "Recipe": [
+            {
+                "Name": "Copper Ingot",
+                "Count": 30
+            }
+        ]
+    },
+    {
+        "Name": "Repair Station",
+        "Recipe": [
+            {
+                "Name": "Iron Ingot",
+                "Count": 40
+            }
+        ]
+    },
+    {
+        "Name": "Small Chemical Refinery",
+        "Recipe": [
+            {
+                "Name": "Copper Ingot",
+                "Count": 45
+            }
+        ]
+    },
+    {
+        "Name": "Small Ore Refinery",
+        "Recipe": [
+            {
+                "Name": "Salvaged Metal",
+                "Count": 90
+            }
+        ]
+    },
+    {
+        "Name": "Small Storage Container",
+        "Recipe": [
+            {
+                "Name": "Salvaged Metal",
+                "Count": 35
+            }
+        ]
+    },
+    {
+        "Name": "Spice Refinery",
+        "Recipe": [
+            {
+                "Name": "Duraluminum Ingot",
+                "Count": 160
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 130
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 80
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 70
+            }
+        ]
+    },
+    {
+        "Name": "Spice-Powered Generator",
+        "Recipe": [
+            {
+                "Name": "Plastanium Ingot",
+                "Count": 430
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 180
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 270
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 100
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 300
+            },
+            {
+                "Name": "Advanced Machinery",
+                "Count": 40
+            }
+        ]
+    },
+    {
+        "Name": "Storage Container",
+        "Recipe": [
+            {
+                "Name": "Aluminum Ingot",
+                "Count": 45
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 8
+            }
+        ]
+    },
+    {
+        "Name": "Sub-Fief Console",
+        "Recipe": [
+            {
+                "Name": "Salvaged Metal",
+                "Count": 25
+            }
+        ]
+    },
+    {
+        "Name": "Survival Fabricator",
+        "Recipe": [
+            {
+                "Name": "Steel Ingot",
+                "Count": 40
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 30
+            }
+        ]
+    },
+    {
+        "Name": "Vehicles Fabricator",
+        "Recipe": [
+            {
+                "Name": "Steel Ingot",
+                "Count": 40
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 30
+            }
+        ]
+    },
+    {
+        "Name": "Weapons Fabricator",
+        "Recipe": [
+            {
+                "Name": "Steel Ingot",
+                "Count": 40
+            },
+            {
+                "Name": "Complex Machinery",
+                "Count": 30
+            }
+        ]
+    },
+    {
+        "Name": "Wind Turbine Directional",
+        "Recipe": [
+            {
+                "Name": "Duraluminum Ingot",
+                "Count": 120
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 160
+            },
+            {
+                "Name": "Calibrated Servok",
+                "Count": 50
+            },
+            {
+                "Name": "Spice Melange",
+                "Count": 3
+            }
+        ]
+    },
+    {
+        "Name": "Wind Turbine Omnidirectional",
+        "Recipe": [
+            {
+                "Name": "Steel Ingot",
+                "Count": 45
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 65
+            },
+            {
+                "Name": "Calibrated Servok",
+                "Count": 20
+            }
+        ]
+    },
+    {
+        "Name": "Windtrap",
+        "Recipe": [
+            {
+                "Name": "Steel Ingot",
+                "Count": 90
+            },
+            {
+                "Name": "Silicone Block",
+                "Count": 30
+            },
+            {
+                "Name": "Calibrated Servok",
+                "Count": 20
+            }
+        ]
+    }
+]
