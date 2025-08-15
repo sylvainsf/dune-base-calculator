@@ -9,6 +9,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --accent: #f39c12; /* Dune-like orange */
+            --accent-hover: #f7ab2f;
+            --switch-purple: #a855f7; /* purple */
+            --switch-purple-on: #7c3aed; /* darker purple when on */
+        }
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #1a1a1a;
@@ -35,14 +41,19 @@
             transition: background-color 0.3s, transform 0.2s;
             border: none;
         }
-        .btn-primary {
-            background-color: #d4ac0d;
-            color: #1a1a1a;
-        }
-        .btn-primary:not(:disabled):hover {
-            background-color: #f1c40f;
-            transform: translateY(-2px);
-        }
+    .btn-primary { background-color: var(--accent); color: #1a1a1a; }
+    .btn-primary:not(:disabled):hover { background-color: var(--accent-hover); transform: translateY(-2px); }
+    /* Accent text/border mapping */
+    .text-d4ac0d { color: var(--accent) !important; }
+    .border-d4ac0d { border-color: var(--accent) !important; }
+    /* Deep Desert toggle button */
+    .toggle-btn { border-width: 2px; border-style: solid; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .toggle-btn-on { background-color: var(--accent); color: #1a1a1a; border-color: var(--accent); }
+    .toggle-btn-off { background-color: transparent; color: var(--accent); border-color: var(--accent); }
+    .toggle-btn .switch { position: relative; width: 48px; height: 24px; border-radius: 9999px; border: 2px solid var(--accent); background: var(--switch-purple); }
+    .toggle-btn-on .switch { background: var(--switch-purple-on); border-color: var(--accent); }
+    .toggle-btn .knob { position: absolute; top: 50%; left: 4px; width: 20px; height: 16px; border-radius: 9999px; background: #ffffff; transform: translateY(-50%); transition: left 0.2s ease; }
+    .toggle-btn-on .knob { left: calc(100% - 4px - 20px); }
         .btn-secondary {
             background-color: #4a4a4a;
             color: #f0e6d2;
@@ -109,6 +120,13 @@
 
             <!-- Right Panel: Materials List -->
             <div class="bg-gray-800 p-6 rounded-lg shadow-lg sticky top-8 overflow-y-auto" style="max-height: calc(100vh - 2rem);">
+                <!-- Deep Desert Toggle Button -->
+                <div class="mb-4">
+                    <button id="deep-desert-btn" class="w-full font-orbitron py-2 px-3 rounded-lg toggle-btn toggle-btn-on">
+                        <span>Deep Desert</span>
+                        <span class="switch"><span class="knob"></span></span>
+                    </button>
+                </div>
                 <!-- Power Widget -->
                 <div class="mb-6">
                     <h3 class="text-2xl font-orbitron text-d4ac0d mb-2 flex items-center gap-2"><span>⚡</span> Power Budget</h3>
@@ -127,7 +145,7 @@
                         </div>
                     </div>
                     <div class="h-3 bg-gray-700 rounded relative overflow-hidden">
-                        <div id="power-bar-available" class="absolute left-0 top-0 h-full bg-yellow-500" style="width: 0%"></div>
+                        <div id="power-bar-available" class="absolute left-0 top-0 h-full" style="width: 0%; background-color: var(--accent)"></div>
                         <div id="power-bar-used" class="absolute left-0 top-0 h-full bg-red-500 opacity-80" style="width: 0%"></div>
                     </div>
                 </div>
@@ -147,7 +165,7 @@
                 </div>
 
                 <h3 class="text-2xl font-orbitron text-d4ac0d mb-4 border-b-2 border-d4ac0d pb-2">Required Materials</h3>
-                <p class="text-sm text-gray-400 mb-4 italic">50% Deep Desert discount has been applied.</p>
+                <p id="deep-desert-note" class="text-sm text-gray-400 mb-4 italic">50% Deep Desert discount has been applied.</p>
                 <div id="materials-list" class="space-y-2 pr-2">
                     <p class="text-gray-500">Add items to see required materials.</p>
                 </div>
@@ -212,11 +230,13 @@
                 itemGrid: document.getElementById('item-grid'),
                 itemGridPlaceholder: document.getElementById('item-grid-placeholder'),
                 materialsList: document.getElementById('materials-list'),
+                deepDesertNote: document.getElementById('deep-desert-note'),
                 selectedItemsList: document.getElementById('selected-items-list'),
                 tierFilter: document.getElementById('tier-filter'),
                 searchInput: document.getElementById('search-input'),
                 totalItemsCount: document.getElementById('total-items-count'),
                 resetBtn: document.getElementById('reset-btn'),
+                deepDesertBtn: document.getElementById('deep-desert-btn'),
                 // Power UI
                 powerAvailable: document.getElementById('power-available'),
                 powerUsed: document.getElementById('power-used'),
@@ -245,6 +265,7 @@
             let selectedItems = {};
             let apartmentConfig = { apartments: 0, per: { "Plastone": 0, "Granite": 0, "Salvaged Metal": 0, "Iron": 0, "Agave Seeds": 0 } };
             const DEEP_DESERT_DISCOUNT = 0.5;
+            let deepDesertEnabled = true;
             const TIER_METALS_ORDERED = ["copper", "iron", "steel", "aluminum", "duraluminum", "plastinium"];
 
             // --- Event Listeners ---
@@ -255,6 +276,14 @@
             dom.apartmentPlannerBtn.addEventListener('click', () => dom.apartmentModal.classList.replace('hidden', 'flex'));
             dom.cancelApartmentBtn.addEventListener('click', () => dom.apartmentModal.classList.replace('flex', 'hidden'));
             dom.addApartmentMatsBtn.addEventListener('click', applyApartmentPlan);
+            if (dom.deepDesertBtn) {
+                dom.deepDesertBtn.addEventListener('click', () => {
+                    deepDesertEnabled = !deepDesertEnabled;
+                    updateDeepDesertButtonState();
+                    if (dom.deepDesertNote) dom.deepDesertNote.style.display = deepDesertEnabled ? '' : 'none';
+                    updateMaterialsList();
+                });
+            }
             
             // --- Data Loading ---
             function loadInitialData() {
@@ -316,6 +345,8 @@
                 updateDataStatus(`Successfully loaded ${allItems.length} craftable items.`, false);
                 updatePower();
                 updateWater();
+                // initialize Deep Desert note visibility
+                if (dom.deepDesertNote) dom.deepDesertNote.style.display = deepDesertEnabled ? '' : 'none';
             }
 
             function updateDataStatus(message, isError = false) {
@@ -418,8 +449,9 @@
                     dom.materialsList.innerHTML = '<p class="text-gray-500">Add items to see required materials.</p>';
                 } else {
                     sortedMaterials.forEach(matName => {
-                        const discountedAmount = Math.ceil(totalMaterials[matName] * DEEP_DESERT_DISCOUNT);
-                        dom.materialsList.innerHTML += `<div class="flex justify-between items-center bg-gray-700 p-2 rounded"><span>${matName}</span><span class="font-bold text-d4ac0d">${discountedAmount.toLocaleString()}</span></div>`;
+                        const baseAmount = totalMaterials[matName];
+                        const amount = deepDesertEnabled ? Math.ceil(baseAmount * DEEP_DESERT_DISCOUNT) : baseAmount;
+                        dom.materialsList.innerHTML += `<div class=\"flex justify-between items-center bg-gray-700 p-2 rounded\"><span>${matName}</span><span class=\"font-bold text-d4ac0d\">${amount.toLocaleString()}</span></div>`;
                     });
                 }
                 // Update selected items list
@@ -447,6 +479,9 @@
                 dom.totalItemsCount.textContent = Object.values(selectedItems).reduce((sum, count) => sum + count, 0);
                 updatePower();
                 updateWater();
+                // Initialize Deep Desert note and button style
+                if (dom.deepDesertNote) dom.deepDesertNote.style.display = deepDesertEnabled ? '' : 'none';
+                updateDeepDesertButtonState();
             }
 
             function updatePower() {
@@ -491,6 +526,12 @@
                 const denom = Math.max(10000, totalL, 1);
                 const pct = Math.min(100, Math.round((totalL / denom) * 100));
                 dom.waterBar.style.width = `${pct}%`;
+            }
+
+            function updateDeepDesertButtonState() {
+                if (!dom.deepDesertBtn) return;
+                dom.deepDesertBtn.classList.remove('toggle-btn-on', 'toggle-btn-off');
+                dom.deepDesertBtn.classList.add('toggle-btn', deepDesertEnabled ? 'toggle-btn-on' : 'toggle-btn-off');
             }
             
             // --- Event Handlers and Logic ---
