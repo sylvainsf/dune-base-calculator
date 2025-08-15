@@ -19,7 +19,8 @@
             "Provides": 0,
             "Consumes": 350
         },
-        "WaterCapacity": 500
+        "WaterCapacity": 500,
+        "Consumables": []
     },
     {
         "Name": "Advanced Garment Fabricator",
@@ -53,7 +54,8 @@
             "Provides": 0,
             "Consumes": 1
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Advanced Sub-Fief Console",
@@ -67,7 +69,8 @@
             "Provides": 0,
             "Consumes": 15
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Advanced Survival Fabricator",
@@ -101,7 +104,8 @@
             "Provides": 0,
             "Consumes": 6
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Advanced Vehicle Fabricator",
@@ -135,7 +139,8 @@
             "Provides": 0,
             "Consumes": 6
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Advanced Weapons Fabricator",
@@ -169,7 +174,13 @@
             "Provides": 0,
             "Consumes": 28
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": [
+            {
+                "Name": "Missile",
+                "Hours": 1.0
+            }
+        ]
     },
     {
         "Name": "Blood Purifier",
@@ -183,7 +194,8 @@
             "Provides": 0,
             "Consumes": 10
         },
-        "WaterCapacity": 1000
+        "WaterCapacity": 1000,
+        "Consumables": []
     },
     {
         "Name": "Chest",
@@ -197,7 +209,8 @@
             "Provides": 0,
             "Consumes": 0
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Fabricator",
@@ -211,7 +224,8 @@
             "Provides": 0,
             "Consumes": 5
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Fremen Deathstill",
@@ -233,7 +247,8 @@
             "Provides": 0,
             "Consumes": 200
         },
-        "WaterCapacity": 500
+        "WaterCapacity": 500,
+        "Consumables": []
     },
     {
         "Name": "Garment Fabricator",
@@ -251,7 +266,8 @@
             "Provides": 0,
             "Consumes": 1
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Improved Blood Purifier",
@@ -273,7 +289,8 @@
             "Provides": 0,
             "Consumes": 35
         },
-        "WaterCapacity": 1000
+        "WaterCapacity": 1000,
+        "Consumables": []
     },
     {
         "Name": "Large Ore Refinery",
@@ -307,7 +324,8 @@
             "Provides": 0,
             "Consumes": 350
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Large Spice Refinery",
@@ -341,7 +359,8 @@
             "Provides": 0,
             "Consumes": 500
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Large Water Cistern",
@@ -363,7 +382,8 @@
             "Provides": 0,
             "Consumes": 0
         },
-        "WaterCapacity": 100000
+        "WaterCapacity": 100000,
+        "Consumables": []
     },
     {
         "Name": "Large Windtrap",
@@ -389,7 +409,17 @@
             "Provides": 0,
             "Consumes": 135
         },
-        "WaterCapacity": 500
+        "WaterCapacity": 500,
+        "Consumables": [
+            {
+                "Name": "Particulate Filter",
+                "Hours": 12.0
+            },
+            {
+                "Name": "Advanced Particulate Filter",
+                "Hours": 1.0
+            }
+        ]
     },
     {
         "Name": "Medium Chemical Refinery",
@@ -415,7 +445,33 @@
             "Provides": 0,
             "Consumes": 350
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": [
+            {
+                "Name": "Medium Sized Vehicle Fuel Cell",
+                "Hours": 1.0
+            },
+            {
+                "Name": "Large Vehicle Fuel Cell",
+                "Hours": 1.0
+            },
+            {
+                "Name": "Industrial-grade Lubricant",
+                "Hours": 1.0
+            },
+            {
+                "Name": "Low-grade Lubricant",
+                "Hours": 1.0
+            },
+            {
+                "Name": "Small Vehicle Fuel Cell",
+                "Hours": 1.0
+            },
+            {
+                "Name": "Spice-infused Fuel Cell",
+                "Hours": 1.0
+            }
+        ]
     },
     {
         "Name": "Medium Ore Refinery",
@@ -437,7 +493,8 @@
             "Provides": 0,
             "Consumes": 45
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Medium Spice Refinery",
@@ -467,7 +524,8 @@
             "Provides": 0,
             "Consumes": 350
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Medium Storage Container",
@@ -489,7 +547,8 @@
             "Provides": 0,
             "Consumes": 0
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Medium Water Cistern",
@@ -507,7 +566,8 @@
             "Provides": 0,
             "Consumes": 0
         },
-        "WaterCapacity": 25000
+        "WaterCapacity": 25000,
+        "Consumables": []
     },
     {
         "Name": "Recycler",
@@ -521,7 +581,8 @@
             "Provides": 0,
             "Consumes": 15
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Repair Station",
@@ -535,7 +596,8 @@
             "Provides": 0,
             "Consumes": 20
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Small Chemical Refinery",
@@ -549,7 +611,25 @@
             "Provides": 0,
             "Consumes": 15
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": [
+            {
+                "Name": "Small Vehicle Fuel Cell",
+                "Hours": 1.0
+            },
+            {
+                "Name": "Medium Sized Vehicle Fuel Cell",
+                "Hours": 1.0
+            },
+            {
+                "Name": "Low-grade Lubricant",
+                "Hours": 1.0
+            },
+            {
+                "Name": "Industrial-grade Lubricant",
+                "Hours": 1.0
+            }
+        ]
     },
     {
         "Name": "Small Ore Refinery",
@@ -563,7 +643,8 @@
             "Provides": 0,
             "Consumes": 15
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Small Storage Container",
@@ -577,7 +658,8 @@
             "Provides": 0,
             "Consumes": 0
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Spice Refinery",
@@ -603,7 +685,8 @@
             "Provides": 0,
             "Consumes": 200
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Spice-Powered Generator",
@@ -637,7 +720,13 @@
             "Provides": 1000,
             "Consumes": 0
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": [
+            {
+                "Name": "Spice-infused Fuel Cell",
+                "Hours": 0.5
+            }
+        ]
     },
     {
         "Name": "Storage Container",
@@ -655,7 +744,8 @@
             "Provides": 0,
             "Consumes": 0
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Sub-Fief Console",
@@ -669,7 +759,8 @@
             "Provides": 0,
             "Consumes": 15
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Survival Fabricator",
@@ -687,7 +778,8 @@
             "Provides": 0,
             "Consumes": 5
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Vehicles Fabricator",
@@ -705,7 +797,8 @@
             "Provides": 0,
             "Consumes": 5
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": []
     },
     {
         "Name": "Weapons Fabricator",
@@ -723,7 +816,17 @@
             "Provides": 0,
             "Consumes": 94
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": [
+            {
+                "Name": "Incendiary Gel",
+                "Hours": 1.0
+            },
+            {
+                "Name": "Rocket",
+                "Hours": 1.0
+            }
+        ]
     },
     {
         "Name": "Wind Turbine Directional",
@@ -749,7 +852,13 @@
             "Provides": 350,
             "Consumes": 0
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": [
+            {
+                "Name": "Industrial-grade Lubricant",
+                "Hours": 0.5
+            }
+        ]
     },
     {
         "Name": "Wind Turbine Omnidirectional",
@@ -771,7 +880,13 @@
             "Provides": 150,
             "Consumes": 0
         },
-        "WaterCapacity": 0
+        "WaterCapacity": 0,
+        "Consumables": [
+            {
+                "Name": "Low-grade Lubricant",
+                "Hours": 1.0
+            }
+        ]
     },
     {
         "Name": "Windtrap",
@@ -793,7 +908,17 @@
             "Provides": 0,
             "Consumes": 75
         },
-        "WaterCapacity": 500
+        "WaterCapacity": 500,
+        "Consumables": [
+            {
+                "Name": "Makeshift Filter",
+                "Hours": 3.0
+            },
+            {
+                "Name": "Standard Filter",
+                "Hours": 8.0
+            }
+        ]
     },
     {
         "Name": "Pentashield",
@@ -816,5 +941,135 @@
             "Consumes": 6
         },
         "WaterCapacity": 0
+    },
+    {
+        "Name": "Missile",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Particulate Filter",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Advanced Particulate Filter",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Medium Sized Vehicle Fuel Cell",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Large Vehicle Fuel Cell",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Industrial-grade Lubricant",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Low-grade Lubricant",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Small Vehicle Fuel Cell",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Spice-infused Fuel Cell",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Incendiary Gel",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Rocket",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Makeshift Filter",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Standard Filter",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
     }
 ]

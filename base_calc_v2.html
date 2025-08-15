@@ -81,6 +81,11 @@
         <header class="text-center mb-8">
             <h1 class="text-4xl lg:text-5xl font-orbitron text-d4ac0d mb-2">Dune: Awakening</h1>
             <h2 class="text-2xl lg:text-3xl font-orbitron text-f0e6d2">Base Calculator</h2>
+            <div class="mt-1 flex justify-center">
+                <div class="font-orbitron text-center text-sm" style="color: var(--switch-purple); transform: scaleX(0.9); transform-origin: center;">
+                    Brought to you by the guild Oblivion on Kadrish
+                </div>
+            </div>
             <div class="mt-4 flex flex-col sm:flex-row justify-center gap-3">
                 <a href="https://donate.cancer.org/" target="_blank" rel="noopener noreferrer" class="btn btn-primary py-2 px-4 rounded-lg text-center">
                     If you like this tool, please consider supporting the American Cancer Society
@@ -164,6 +169,21 @@
                     </div>
                 </div>
 
+                <!-- Consumables Auto-Calculation -->
+                <div class="mb-6">
+                    <h3 class="text-2xl font-orbitron mb-2 flex items-center gap-2"><span>⛽</span> Consumables (Auto)</h3>
+                    <label class="block text-sm text-gray-300 mb-1" for="consumable-days">Run equipment for:</label>
+                    <div class="flex items-center gap-2 mb-3">
+                        <input id="consumable-days" type="number" min="0" step="1" value="7" class="w-28 bg-gray-700 border border-gray-600 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-d4ac0d" />
+                        <span class="text-gray-300">days</span>
+                    </div>
+                    <div id="consumables-list" class="space-y-2">
+                        <p class="text-gray-500">No consumables added.</p>
+                    </div>
+                </div>
+
+                
+
                 <h3 class="text-2xl font-orbitron text-d4ac0d mb-4 border-b-2 border-d4ac0d pb-2">Required Materials</h3>
                 <p id="deep-desert-note" class="text-sm text-gray-400 mb-4 italic">50% Deep Desert discount has been applied.</p>
                 <div id="materials-list" class="space-y-2 pr-2">
@@ -176,6 +196,12 @@
                 <div class="mt-6 border-t-2 border-gray-700 pt-4 flex justify-between items-center">
                     <h4 class="text-xl font-bold">Total Items: <span id="total-items-count">0</span></h4>
                     <button id="reset-btn" class="btn btn-secondary py-2 px-4 rounded-lg">Reset All</button>
+                </div>
+                <!-- Export/Import -->
+                <div class="mt-4 flex gap-3">
+                    <button id="export-btn" class="btn btn-primary py-2 px-4 rounded-lg flex-1">Export</button>
+                    <button id="import-btn" class="btn btn-secondary py-2 px-4 rounded-lg flex-1">Import</button>
+                    <input id="import-file" type="file" accept="application/json" class="hidden" />
                 </div>
             </div>
         </div>
@@ -236,6 +262,9 @@
                 searchInput: document.getElementById('search-input'),
                 totalItemsCount: document.getElementById('total-items-count'),
                 resetBtn: document.getElementById('reset-btn'),
+                exportBtn: document.getElementById('export-btn'),
+                importBtn: document.getElementById('import-btn'),
+                importFile: document.getElementById('import-file'),
                 deepDesertBtn: document.getElementById('deep-desert-btn'),
                 // Power UI
                 powerAvailable: document.getElementById('power-available'),
@@ -251,6 +280,10 @@
                 apartmentModal: document.getElementById('apartment-modal'),
                 cancelApartmentBtn: document.getElementById('cancel-apartment'),
                 addApartmentMatsBtn: document.getElementById('add-apartment-mats'),
+                // Consumables
+                consumableDays: document.getElementById('consumable-days'),
+                consumablesList: document.getElementById('consumables-list'),
+                
                 // Apartment fields
                 aptNumPeople: document.getElementById('num-people'),
                 aptPlastone: document.getElementById('plastone-per'),
@@ -262,7 +295,9 @@
 
             // --- State and Constants ---
             let allItems = [];
+            let consumableCatalog = [];
             let selectedItems = {};
+            let targetDays = 7;
             let apartmentConfig = { apartments: 0, per: { "Plastone": 0, "Granite": 0, "Salvaged Metal": 0, "Iron": 0, "Agave Seeds": 0 } };
             const DEEP_DESERT_DISCOUNT = 0.5;
             let deepDesertEnabled = true;
@@ -276,12 +311,25 @@
             dom.apartmentPlannerBtn.addEventListener('click', () => dom.apartmentModal.classList.replace('hidden', 'flex'));
             dom.cancelApartmentBtn.addEventListener('click', () => dom.apartmentModal.classList.replace('flex', 'hidden'));
             dom.addApartmentMatsBtn.addEventListener('click', applyApartmentPlan);
+            if (dom.exportBtn) dom.exportBtn.addEventListener('click', exportStateToFile);
+            if (dom.importBtn && dom.importFile) {
+                dom.importBtn.addEventListener('click', () => dom.importFile.click());
+                dom.importFile.addEventListener('change', handleImportFileChange);
+            }
             if (dom.deepDesertBtn) {
                 dom.deepDesertBtn.addEventListener('click', () => {
                     deepDesertEnabled = !deepDesertEnabled;
                     updateDeepDesertButtonState();
                     if (dom.deepDesertNote) dom.deepDesertNote.style.display = deepDesertEnabled ? '' : 'none';
                     updateMaterialsList();
+                });
+            }
+            if (dom.consumableDays) {
+                dom.consumableDays.addEventListener('input', () => {
+                    const v = parseInt(dom.consumableDays.value, 10);
+                    targetDays = isNaN(v) || v < 0 ? 0 : v;
+                    renderConsumablesList();
+                    
                 });
             }
             
@@ -328,10 +376,17 @@
                     return;
                 }
                 
-                allItems = data.filter(item => item.Recipe && Array.isArray(item.Recipe) && item.Recipe.length > 0);
+                allItems = data.filter(item => item.Recipe && Array.isArray(item.Recipe) && item.Recipe.length > 0 && !item.IsConsumable);
                 allItems.forEach(item => {
                     item.CalculatedTier = getItemTier(item);
                 });
+
+                // Build consumable catalog from items' Consumables
+                const cset = new Set();
+                allItems.forEach(item => {
+                    (item.Consumables || []).forEach(c => { if (c && c.Name) cset.add(c.Name); });
+                });
+                consumableCatalog = Array.from(cset).sort();
 
                 populateTiers();
                 displayItems();
@@ -347,6 +402,7 @@
                 updateWater();
                 // initialize Deep Desert note visibility
                 if (dom.deepDesertNote) dom.deepDesertNote.style.display = deepDesertEnabled ? '' : 'none';
+                
             }
 
             function updateDataStatus(message, isError = false) {
@@ -382,6 +438,8 @@
                     dom.tierFilter.appendChild(option);
                 });
             }
+
+            // no consumable picker needed with auto-calc
 
             function displayItems() {
                 dom.itemGrid.innerHTML = '';
@@ -482,6 +540,7 @@
                 // Initialize Deep Desert note and button style
                 if (dom.deepDesertNote) dom.deepDesertNote.style.display = deepDesertEnabled ? '' : 'none';
                 updateDeepDesertButtonState();
+                renderConsumablesList();
             }
 
             function updatePower() {
@@ -533,15 +592,56 @@
                 dom.deepDesertBtn.classList.remove('toggle-btn-on', 'toggle-btn-off');
                 dom.deepDesertBtn.classList.add('toggle-btn', deepDesertEnabled ? 'toggle-btn-on' : 'toggle-btn-off');
             }
+
+            function renderConsumablesList() {
+                if (!dom.consumablesList) return;
+                // Aggregate required consumables to run selected equipment for targetDays
+                const totals = {};
+                const equip = Object.entries(selectedItems)
+                    .map(([name, count]) => ({ name, count, item: allItems.find(i => i.Name === name) }))
+                    .filter(x => x.item && x.count > 0 && Array.isArray(x.item.Consumables) && x.item.Consumables.length > 0);
+
+                equip.forEach(({ count, item }) => {
+                    const options = (item.Consumables || []).filter(c => c && c.Name);
+                    if (options.length === 0) return;
+                    // choose the option with the largest Hours (most efficient)
+                    const best = options.reduce((a,b) => (a.Hours||0) >= (b.Hours||0) ? a : b);
+                    const hoursNeeded = (targetDays * 24) * count;
+                    const hoursPerUnit = Math.max(0.001, best.Hours || 1);
+                    const units = Math.ceil(hoursNeeded / hoursPerUnit);
+                    totals[best.Name] = (totals[best.Name] || 0) + units;
+                });
+
+                const entries = Object.entries(totals).sort((a,b) => a[0].localeCompare(b[0]));
+                if (entries.length === 0) {
+                    dom.consumablesList.innerHTML = '<p class="text-gray-500">No consumables required for the currently selected items.</p>';
+                    return;
+                }
+                dom.consumablesList.innerHTML = '';
+                entries.forEach(([name, qty]) => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center justify-between bg-gray-700 p-2 rounded';
+                    row.innerHTML = `
+                        <span class="font-semibold">${name}</span>
+                        <span class="font-bold text-d4ac0d">${qty.toLocaleString()}</span>
+                    `;
+                    dom.consumablesList.appendChild(row);
+                });
+            }
+
+            
             
             // --- Event Handlers and Logic ---
             function resetCalculator() {
                 selectedItems = {};
+                // keep targetDays as user set
                 apartmentConfig = { apartments: 0, per: { "Plastone": 0, "Granite": 0, "Salvaged Metal": 0, "Iron": 0, "Agave Seeds": 0 } };
                 if(allItems.length > 0) {
                     displayItems();
                 }
                 updateMaterialsList();
+                renderConsumablesList();
+                
             }
 
             function handleItemGridClick(e) {
@@ -586,6 +686,120 @@
 
             // --- Data File Management ---
             // (upload removed; JSON auto-loads if present)
+
+            // --- Export / Import State ---
+            function getExportState() {
+                return {
+                    version: 1,
+                    savedAt: new Date().toISOString(),
+                    deepDesertEnabled,
+                    targetDays,
+                    selectedItems,
+                    apartmentConfig
+                };
+            }
+
+            function exportStateToFile() {
+                try {
+                    const state = getExportState();
+                    const json = JSON.stringify(state, null, 2);
+                    const blob = new Blob([json], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    const d = new Date();
+                    const yyyy = d.getFullYear();
+                    const mm = String(d.getMonth() + 1).padStart(2, '0');
+                    const dd = String(d.getDate()).padStart(2, '0');
+                    a.href = url;
+                    a.download = `dune_base_${yyyy}-${mm}-${dd}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }, 0);
+                } catch (e) {
+                    console.error('Export failed:', e);
+                    alert('Export failed. See console for details.');
+                }
+            }
+
+            function handleImportFileChange(evt) {
+                const file = evt.target.files && evt.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const data = JSON.parse(reader.result);
+                        applyImportedState(data);
+                    } catch (e) {
+                        console.error('Import failed:', e);
+                        alert('Invalid JSON file.');
+                    } finally {
+                        dom.importFile.value = '';
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            function applyImportedState(data) {
+                if (!data || typeof data !== 'object') return;
+                try {
+                    // Deep Desert
+                    if (typeof data.deepDesertEnabled === 'boolean') {
+                        deepDesertEnabled = data.deepDesertEnabled;
+                        updateDeepDesertButtonState();
+                        if (dom.deepDesertNote) dom.deepDesertNote.style.display = deepDesertEnabled ? '' : 'none';
+                    }
+                    // Days
+                    if (typeof data.targetDays === 'number' && isFinite(data.targetDays)) {
+                        targetDays = Math.max(0, Math.floor(data.targetDays));
+                        if (dom.consumableDays) dom.consumableDays.value = String(targetDays);
+                    }
+                    // Selected items
+                    if (data.selectedItems && typeof data.selectedItems === 'object') {
+                        selectedItems = {};
+                        for (const [k,v] of Object.entries(data.selectedItems)) {
+                            const n = Math.max(0, parseInt(v, 10) || 0);
+                            if (n > 0) selectedItems[k] = n;
+                        }
+                    }
+                    // Apartments
+                    if (data.apartmentConfig && typeof data.apartmentConfig === 'object') {
+                        const a = data.apartmentConfig;
+                        apartmentConfig = {
+                            apartments: Math.max(0, parseInt(a.apartments, 10) || 0),
+                            per: {
+                                'Plastone': Math.max(0, parseInt(a?.per?.['Plastone'], 10) || 0),
+                                'Granite': Math.max(0, parseInt(a?.per?.['Granite'], 10) || 0),
+                                'Salvaged Metal': Math.max(0, parseInt(a?.per?.['Salvaged Metal'], 10) || 0),
+                                'Iron': Math.max(0, parseInt(a?.per?.['Iron'], 10) || 0),
+                                'Agave Seeds': Math.max(0, parseInt(a?.per?.['Agave Seeds'], 10) || 0),
+                            }
+                        };
+                        // Reflect in modal fields
+                        dom.aptNumPeople.value = String(apartmentConfig.apartments);
+                        dom.aptPlastone.value = String(apartmentConfig.per['Plastone'] || 0);
+                        dom.aptGranite.value = String(apartmentConfig.per['Granite'] || 0);
+                        dom.aptSalvaged.value = String(apartmentConfig.per['Salvaged Metal'] || 0);
+                        dom.aptIron.value = String(apartmentConfig.per['Iron'] || 0);
+                        dom.aptAgave.value = String(apartmentConfig.per['Agave Seeds'] || 0);
+                    }
+
+                    // Refresh UI
+                    displayItems();
+                    // Update counts on cards
+                    Object.entries(selectedItems).forEach(([name, count]) => {
+                        const safe = CSS.escape(name);
+                        const el = dom.itemGrid.querySelector(`.item-count[data-item-name="${safe}"]`);
+                        if (el) el.textContent = count;
+                    });
+                    updateMaterialsList();
+                } catch (e) {
+                    console.error('Failed to apply imported state:', e);
+                    alert('Failed to apply imported state.');
+                }
+            }
 
             // --- Kick off data load ---
             try {

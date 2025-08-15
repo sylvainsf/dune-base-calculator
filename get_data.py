@@ -250,6 +250,131 @@ def parse_water_capacity_from_page(soup):
     return int(capacity_l or 0)
 
 
+def _parse_hours(text: str):
+    """Parse a duration string like '1h', '2 hours', '30m' into hours (float)."""
+    if not text:
+        return None
+    t = text.strip().lower()
+    # minutes first
+    m = re.search(r"(\d+(?:\.\d+)?)\s*(?:m|min|mins|minute|minutes)\b", t)
+    if m:
+        return float(m.group(1)) / 60.0
+    m = re.search(r"(\d+(?:\.\d+)?)\s*(?:h|hr|hrs|hour|hours)\b", t)
+    if m:
+        return float(m.group(1))
+    # compact like x1h or 1h without space
+    m = re.search(r"x\s*(\d+(?:\.\d+)?)\s*h\b", t)
+    if m:
+        return float(m.group(1))
+    m = re.search(r"(\d+(?:\.\d+)?)h\b", t)
+    if m:
+        return float(m.group(1))
+    return None
+
+
+def parse_consumables_from_page(soup):
+    """Parse consumables for equipment: list of {Name, Hours}.
+    Looks for table rows labeled Consumable(s)/Fuel/Lubricant/Upkeep and extracts names and hours.
+    """
+    results = []
+    # Table-based: handle row-wise labeling and explicit two-column headers
+    for tbl in soup.find_all('table'):
+        headers = [th.get_text(' ', strip=True).lower() for th in tbl.find_all('th')]
+        looks_like_consumable_table = any('consumable' in h or 'fuel' in h or 'lubricant' in h for h in headers) and any('burn' in h or 'time' in h or 'duration' in h for h in headers)
+        for row in tbl.find_all('tr'):
+            ths = row.find_all('th')
+            tds = row.find_all('td')
+            if ths and tds:
+                # pattern: header + value in same row (infobox style)
+                label = ths[0].get_text(' ', strip=True).lower()
+                if any(k in label for k in ("consumable", "consumables", "fuel", "lubricant", "upkeep", "maintenance")):
+                    value_el = tds[-1]
+                    anchors = value_el.find_all('a')
+                    seen = set()
+                    if anchors:
+                        for a in anchors:
+                            nm = a.get_text(' ', strip=True) or a.get('title') or ''
+                            if not nm or nm in seen:
+                                continue
+                            seen.add(nm)
+                            ctx = value_el.get_text(' ', strip=True)
+                            hrs = _parse_hours(ctx) or 1.0
+                            results.append({"Name": nm, "Hours": float(hrs)})
+                    else:
+                        text = value_el.get_text(' ', strip=True)
+                        hrs = _parse_hours(text) or 1.0
+                        if text:
+                            results.append({"Name": text, "Hours": float(hrs)})
+            elif looks_like_consumable_table and len(tds) >= 2:
+                # pattern: explicit columns: first col = consumable name (with anchor), second col = burn time
+                name_cell = tds[0]
+                time_cell = tds[1]
+                anchors = name_cell.find_all('a')
+                candidate_names = []
+                for a in anchors:
+                    href = (a.get('href') or '').strip()
+                    title = (a.get('title') or '').strip()
+                    text = (a.get_text(' ', strip=True) or '').strip()
+                    # Skip image/file anchors
+                    if href.startswith('/File:') or title.startswith('File:'):
+                        continue
+                    if text:
+                        candidate_names.append(text)
+                    elif title:
+                        candidate_names.append(title)
+                if candidate_names:
+                    # Prefer the longest readable candidate (typically the text anchor after the image)
+                    nm = max(candidate_names, key=len)
+                else:
+                    # Fallback to plain text from the cell
+                    nm = (name_cell.get_text(' ', strip=True) or '').strip()
+                hrs = _parse_hours(time_cell.get_text(' ', strip=True) if time_cell else '') or 1.0
+                if nm:
+                    results.append({"Name": nm, "Hours": float(hrs)})
+
+    # Fallback: scan generic rows for labels
+    if not results:
+        for row in soup.find_all('tr'):
+            tds = row.find_all('td')
+            label_el = row.find('th') or (tds[0] if len(tds) >= 2 else None)
+            value_el = (tds[1] if len(tds) >= 2 else (tds[0] if len(tds) == 1 and row.find('th') else None))
+            if not label_el or not value_el:
+                continue
+            label = (label_el.get_text(" ", strip=True) or '').lower()
+            if not any(k in label for k in ("consumable", "consumables", "fuel", "lubricant", "upkeep", "maintenance")):
+                continue
+            anchors = value_el.find_all('a')
+            seen = set()
+            if anchors:
+                for a in anchors:
+                    nm = a.get_text(" ", strip=True) or a.get('title') or ''
+                    if not nm or nm in seen:
+                        continue
+                    seen.add(nm)
+                    ctx = value_el.get_text(" ", strip=True)
+                    hrs = _parse_hours(ctx) or 1.0
+                    results.append({"Name": nm, "Hours": float(hrs)})
+            else:
+                text = value_el.get_text(" ", strip=True)
+                parts = [p.strip() for p in re.split(r",|;|\n", text) if p.strip()]
+                for p in parts:
+                    m = re.match(r"(.+?)\s*(?:x\s*)?(.*)$", p)
+                    if not m:
+                        continue
+                    nm = m.group(1).strip()
+                    hrs = _parse_hours(m.group(2)) or 1.0
+                    if nm:
+                        results.append({"Name": nm, "Hours": float(hrs)})
+
+    # De-dup by Name, keep max hours found
+    by_name = {}
+    for r in results:
+        prev = by_name.get(r["Name"])
+        if not prev or r["Hours"] > prev["Hours"]:
+            by_name[r["Name"]] = r
+    return list(by_name.values())
+
+
 def scrape_recipe_from_page(url):
     """Scrapes an item page to extract its recipe and power using the 'Build Cost' section first, with debug logs."""
     headers = {'User-Agent': USER_AGENT}
@@ -493,7 +618,8 @@ def scrape_recipe_from_page(url):
 
         power = parse_power_from_page(soup)
         water_capacity = parse_water_capacity_from_page(soup)
-        return {"Recipe": recipe, "Power": power, "WaterCapacity": water_capacity}
+        consumables = parse_consumables_from_page(soup)
+        return {"Recipe": recipe, "Power": power, "WaterCapacity": water_capacity, "Consumables": consumables}
 
     except requests.exceptions.RequestException as e:
         print(f"[page] ERROR: Could not scrape page {url}: {e}")
@@ -525,7 +651,8 @@ def main():
                         "Name": name,
                         "Recipe": result.get("Recipe", []),
                         "Power": result.get("Power", {"Provides": 0, "Consumes": 0}),
-                        "WaterCapacity": int(result.get("WaterCapacity", 0))
+                        "WaterCapacity": int(result.get("WaterCapacity", 0)),
+                        "Consumables": result.get("Consumables", [])
                     }
                     all_item_data.append(item_data)
                 time.sleep(1)  # respectful delay
@@ -544,6 +671,23 @@ def main():
 
         # Merge manual items regardless of mode
         all_item_data = merge_manual_items(all_item_data)
+
+        # Ensure minimal "consumable" items exist for selection (no recipe needed)
+        existing_names = {i.get("Name") for i in all_item_data}
+        minimal_consumables = []
+        for item in list(all_item_data):
+            for c in (item.get("Consumables") or []):
+                cname = c.get("Name")
+                if cname and cname not in existing_names:
+                    minimal_consumables.append({
+                        "Name": cname,
+                        "Recipe": [],
+                        "Power": {"Provides": 0, "Consumes": 0},
+                        "WaterCapacity": 0,
+                        "IsConsumable": True
+                    })
+                    existing_names.add(cname)
+        all_item_data.extend(minimal_consumables)
 
         print(f"\n[save] Saving data for {len(all_item_data)} items to {OUTPUT_FILENAME}...")
         with open(OUTPUT_FILENAME, 'w', encoding='utf-8') as f:
