@@ -1,15 +1,40 @@
+import argparse
+import json
+import os
+import re
+import time
+from urllib.parse import unquote
+
 import requests
 from bs4 import BeautifulSoup
-import json
-import time
-import re
-from urllib.parse import unquote
 
 # Configuration
 BASE_URL = "https://awakening.wiki"
 CATEGORY_URL = f"{BASE_URL}/Category:Placeables"
 OUTPUT_FILENAME = "items_data.json"
 USER_AGENT = "DuneAwakeningDataExtractor/4.0 (Python script; github.com/Gizmo3030/Dune-Awakening-API)"
+
+
+def merge_manual_items(items):
+    """Merge hard-coded manual items into the provided list by Name.
+    If a manual item shares a Name with an existing one, manual overwrites.
+    """
+    manual = [
+        {
+            "Name": "Pentashield",
+            "Recipe": [
+                {"Name": "Calibrated Servoks", "Count": 6},
+                {"Name": "Steel", "Count": 2},
+                {"Name": "Cobalt Paste", "Count": 20},
+            ],
+            "Power": {"Provides": 0, "Consumes": 6},
+            "WaterCapacity": 0,
+        }
+    ]
+    by_name = {i.get("Name"): i for i in items}
+    for m in manual:
+        by_name[m["Name"]] = m
+    return list(by_name.values())
 
 def get_placeable_links(url):
     """Scrapes a category page to get links to all placeable items."""
@@ -476,37 +501,54 @@ def scrape_recipe_from_page(url):
 
 
 def main():
-    """Main function to run the scraper."""
-    try:
-        item_links = get_placeable_links(CATEGORY_URL)
-        all_item_data = []
+    """Main function to run the scraper.
 
-        for i, link in enumerate(item_links):
-            print(f"[item] Processing {i+1}/{len(item_links)}: {link}")
-            
-            result = scrape_recipe_from_page(link)
-            
-            # Get item name from the end of the link
-            name = unquote(link.split('/')[-1]).replace('_', ' ').strip()
-            
-            if result is not None:
-                item_data = {
-                    "Name": name,
-                    "Recipe": result.get("Recipe", []),
-                    "Power": result.get("Power", {"Provides": 0, "Consumes": 0}),
-                    "WaterCapacity": int(result.get("WaterCapacity", 0))
-                }
-                all_item_data.append(item_data)
-            
-            # Respectful delay
-            time.sleep(1)
+    By default, this script will NOT poll external sources.
+    Use --update to fetch fresh data from the wiki; otherwise we merge manual items
+    into the existing items_data.json if present and write the result out.
+    """
+    parser = argparse.ArgumentParser(description="Dune: Awakening data scraper")
+    parser.add_argument("--update", "-u", action="store_true", help="Fetch fresh data from external sources (wiki)")
+    args = parser.parse_args()
+
+    try:
+        all_item_data = []
+        if args.update:
+            print("[mode] Update mode ON: polling external sources (wiki)...")
+            item_links = get_placeable_links(CATEGORY_URL)
+            for i, link in enumerate(item_links):
+                print(f"[item] Processing {i+1}/{len(item_links)}: {link}")
+                result = scrape_recipe_from_page(link)
+                name = unquote(link.split('/')[-1]).replace('_', ' ').strip()
+                if result is not None:
+                    item_data = {
+                        "Name": name,
+                        "Recipe": result.get("Recipe", []),
+                        "Power": result.get("Power", {"Provides": 0, "Consumes": 0}),
+                        "WaterCapacity": int(result.get("WaterCapacity", 0))
+                    }
+                    all_item_data.append(item_data)
+                time.sleep(1)  # respectful delay
+        else:
+            print("[mode] Update mode OFF: skipping external polling.")
+            if os.path.exists(OUTPUT_FILENAME):
+                try:
+                    with open(OUTPUT_FILENAME, 'r', encoding='utf-8') as f:
+                        all_item_data = json.load(f)
+                    print(f"[load] Loaded {len(all_item_data)} items from existing {OUTPUT_FILENAME}.")
+                except Exception as e:
+                    print(f"[load] WARNING: Could not load existing {OUTPUT_FILENAME}: {e}")
+                    all_item_data = []
+            else:
+                print(f"[load] No existing {OUTPUT_FILENAME} found; starting with empty set.")
+
+        # Merge manual items regardless of mode
+        all_item_data = merge_manual_items(all_item_data)
 
         print(f"\n[save] Saving data for {len(all_item_data)} items to {OUTPUT_FILENAME}...")
         with open(OUTPUT_FILENAME, 'w', encoding='utf-8') as f:
             json.dump(all_item_data, f, indent=4)
-        # Report file size
         try:
-            import os
             size = os.path.getsize(OUTPUT_FILENAME)
             print(f"[save] Wrote {size} bytes to {OUTPUT_FILENAME}.")
         except Exception as e:

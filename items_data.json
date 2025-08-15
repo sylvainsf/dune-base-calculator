@@ -794,5 +794,27 @@
             "Consumes": 75
         },
         "WaterCapacity": 500
+    },
+    {
+        "Name": "Pentashield",
+        "Recipe": [
+            {
+                "Name": "Calibrated Servoks",
+                "Count": 6
+            },
+            {
+                "Name": "Steel",
+                "Count": 2
+            },
+            {
+                "Name": "Cobalt Paste",
+                "Count": 20
+            }
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 6
+        },
+        "WaterCapacity": 0
     }
 ]
