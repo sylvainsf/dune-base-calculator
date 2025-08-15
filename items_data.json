@@ -14,7 +14,11 @@
                 "Name": "Complex Machinery",
                 "Count": 70
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 350
+        }
     },
     {
         "Name": "Advanced Garment Fabricator",
@@ -43,7 +47,11 @@
                 "Name": "Armor Plating",
                 "Count": 115
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 1
+        }
     },
     {
         "Name": "Advanced Sub-Fief Console",
@@ -52,7 +60,11 @@
                 "Name": "Salvaged Metal",
                 "Count": 40
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 15
+        }
     },
     {
         "Name": "Advanced Survival Fabricator",
@@ -81,7 +93,11 @@
                 "Name": "Thermoelectric Cooler",
                 "Count": 30
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 6
+        }
     },
     {
         "Name": "Advanced Vehicle Fabricator",
@@ -110,7 +126,11 @@
                 "Name": "Industrial Pump",
                 "Count": 50
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 6
+        }
     },
     {
         "Name": "Advanced Weapons Fabricator",
@@ -139,7 +159,11 @@
                 "Name": "Military Power Regulator",
                 "Count": 40
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 28
+        }
     },
     {
         "Name": "Blood Purifier",
@@ -148,7 +172,11 @@
                 "Name": "Salvaged Metal",
                 "Count": 70
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 10
+        }
     },
     {
         "Name": "Chest",
@@ -157,7 +185,11 @@
                 "Name": "Iron Ingot",
                 "Count": 20
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        }
     },
     {
         "Name": "Fabricator",
@@ -166,7 +198,11 @@
                 "Name": "Salvaged Metal",
                 "Count": 75
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 5
+        }
     },
     {
         "Name": "Fremen Deathstill",
@@ -183,7 +219,11 @@
                 "Name": "Complex Machinery",
                 "Count": 32
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 200
+        }
     },
     {
         "Name": "Garment Fabricator",
@@ -196,7 +236,11 @@
                 "Name": "Complex Machinery",
                 "Count": 30
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 1
+        }
     },
     {
         "Name": "Improved Blood Purifier",
@@ -213,7 +257,11 @@
                 "Name": "Complex Machinery",
                 "Count": 20
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 35
+        }
     },
     {
         "Name": "Large Ore Refinery",
@@ -242,7 +290,11 @@
                 "Name": "Advanced Machinery",
                 "Count": 40
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 350
+        }
     },
     {
         "Name": "Large Spice Refinery",
@@ -271,7 +323,11 @@
                 "Name": "Advanced Machinery",
                 "Count": 55
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 500
+        }
     },
     {
         "Name": "Large Water Cistern",
@@ -288,7 +344,11 @@
                 "Name": "Industrial Pump",
                 "Count": 25
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        }
     },
     {
         "Name": "Large Windtrap",
@@ -309,7 +369,11 @@
                 "Name": "Spice Melange",
                 "Count": 5
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 135
+        }
     },
     {
         "Name": "Medium Chemical Refinery",
@@ -330,7 +394,11 @@
                 "Name": "Spice Melange",
                 "Count": 35
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 350
+        }
     },
     {
         "Name": "Medium Ore Refinery",
@@ -347,7 +415,11 @@
                 "Name": "Complex Machinery",
                 "Count": 50
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 45
+        }
     },
     {
         "Name": "Medium Spice Refinery",
@@ -372,7 +444,11 @@
                 "Name": "Cobalt Paste",
                 "Count": 190
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 350
+        }
     },
     {
         "Name": "Medium Storage Container",
@@ -389,7 +465,11 @@
                 "Name": "Spice Melange",
                 "Count": 4
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        }
     },
     {
         "Name": "Medium Water Cistern",
@@ -402,7 +482,11 @@
                 "Name": "Silicone Block",
                 "Count": 30
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        }
     },
     {
         "Name": "Recycler",
@@ -411,7 +495,11 @@
                 "Name": "Copper Ingot",
                 "Count": 30
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 15
+        }
     },
     {
         "Name": "Repair Station",
@@ -420,7 +508,11 @@
                 "Name": "Iron Ingot",
                 "Count": 40
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 20
+        }
     },
     {
         "Name": "Small Chemical Refinery",
@@ -429,7 +521,11 @@
                 "Name": "Copper Ingot",
                 "Count": 45
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 15
+        }
     },
     {
         "Name": "Small Ore Refinery",
@@ -438,7 +534,11 @@
                 "Name": "Salvaged Metal",
                 "Count": 90
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 15
+        }
     },
     {
         "Name": "Small Storage Container",
@@ -447,7 +547,11 @@
                 "Name": "Salvaged Metal",
                 "Count": 35
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        }
     },
     {
         "Name": "Spice Refinery",
@@ -468,7 +572,11 @@
                 "Name": "Complex Machinery",
                 "Count": 70
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 200
+        }
     },
     {
         "Name": "Spice-Powered Generator",
@@ -497,7 +605,11 @@
                 "Name": "Advanced Machinery",
                 "Count": 40
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 1000,
+            "Consumes": 0
+        }
     },
     {
         "Name": "Storage Container",
@@ -510,7 +622,11 @@
                 "Name": "Silicone Block",
                 "Count": 8
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        }
     },
     {
         "Name": "Sub-Fief Console",
@@ -519,7 +635,11 @@
                 "Name": "Salvaged Metal",
                 "Count": 25
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 15
+        }
     },
     {
         "Name": "Survival Fabricator",
@@ -532,7 +652,11 @@
                 "Name": "Complex Machinery",
                 "Count": 30
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 5
+        }
     },
     {
         "Name": "Vehicles Fabricator",
@@ -545,7 +669,11 @@
                 "Name": "Complex Machinery",
                 "Count": 30
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 5
+        }
     },
     {
         "Name": "Weapons Fabricator",
@@ -558,7 +686,11 @@
                 "Name": "Complex Machinery",
                 "Count": 30
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 94
+        }
     },
     {
         "Name": "Wind Turbine Directional",
@@ -579,7 +711,11 @@
                 "Name": "Spice Melange",
                 "Count": 3
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 350,
+            "Consumes": 0
+        }
     },
     {
         "Name": "Wind Turbine Omnidirectional",
@@ -596,7 +732,11 @@
                 "Name": "Calibrated Servok",
                 "Count": 20
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 150,
+            "Consumes": 0
+        }
     },
     {
         "Name": "Windtrap",
@@ -613,6 +753,10 @@
                 "Name": "Calibrated Servok",
                 "Count": 20
             }
-        ]
+        ],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 75
+        }
     }
 ]

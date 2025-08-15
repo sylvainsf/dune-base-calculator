@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dune: Awakening - Base Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a1a1a;
+            color: #f0e6d2;
+        }
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .card {
+            background-color: #2c2c2c;
+            border: 1px solid #4a4a4a;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.2s;
+            border: none;
+        }
+        .btn-primary {
+            background-color: #d4ac0d;
+            color: #1a1a1a;
+        }
+        .btn-primary:not(:disabled):hover {
+            background-color: #f1c40f;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background-color: #4a4a4a;
+            color: #f0e6d2;
+        }
+        .btn-secondary:not(:disabled):hover {
+            background-color: #5a5a5a;
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            background-color: #3a3a3a;
+            color: #777;
+            cursor: not-allowed;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #2c2c2c; }
+        ::-webkit-scrollbar-thumb { background: #4a4a4a; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #5a5a5a; }
+        .modal-bg { background-color: rgba(0,0,0,0.7); }
+    </style>
+</head>
+<body class="p-4 lg:p-8">
+
+    <div class="max-w-screen-2xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl lg:text-5xl font-orbitron text-d4ac0d mb-2">Dune: Awakening</h1>
+            <h2 class="text-2xl lg:text-3xl font-orbitron text-f0e6d2">Base Calculator</h2>
+            <div class="mt-4 flex justify-center">
+                <a href="https://donate.cancer.org/" target="_blank" rel="noopener noreferrer" class="btn btn-primary py-2 px-4 rounded-lg">
+                    If you like this tool, please consider supporting the American Cancer Society
+                </a>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Panel: Item Selection -->
+            <div class="lg:col-span-2">
+                <!-- Filters -->
+                <div class="bg-gray-800 p-4 rounded-lg mb-6 shadow-lg flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-4 z-10">
+                    <div class="flex-grow w-full sm:w-auto">
+                        <input type="text" id="search-input" placeholder="Search for items..." class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-d4ac0d" disabled>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="tier-filter" class="font-bold text-lg">Tier:</label>
+                        <select id="tier-filter" class="bg-gray-700 border border-gray-600 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-d4ac0d" disabled>
+                            <option value="all">All Tiers</option>
+                        </select>
+                    </div>
+                    <button id="apartment-planner-btn" class="btn btn-primary py-2 px-4 rounded-lg w-full sm:w-auto" disabled>Apartment Planner</button>
+                </div>
+
+                <!-- Item Grid -->
+                <div id="item-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 min-h-[400px] items-center justify-center bg-gray-900/50 rounded-lg p-8">
+                    <div id="item-grid-placeholder" class="text-center col-span-full">
+                         <h3 id="placeholder-title" class="text-gray-300 text-2xl font-orbitron mb-4">Loading Item Data...</h3>
+                         <p id="placeholder-text" class="text-gray-400 text-lg mb-6">Attempting to load `items_data.json`.</p>
+                         <p id="data-status" class="text-lg text-gray-400 mt-4 h-6"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Materials List -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-lg sticky top-8 overflow-y-auto" style="max-height: calc(100vh - 2rem);">
+                <!-- Power Widget -->
+                <div class="mb-6">
+                    <h3 class="text-2xl font-orbitron text-d4ac0d mb-2 flex items-center gap-2"><span>⚡</span> Power Budget</h3>
+                    <div class="flex items-center justify-between text-sm mb-2">
+                        <div>
+                            <span class="text-gray-300">Available:</span>
+                            <span id="power-available" class="font-bold">0</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-300">Used:</span>
+                            <span id="power-used" class="font-bold">0</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-300">Balance:</span>
+                            <span id="power-balance" class="font-bold">0</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-700 rounded relative overflow-hidden">
+                        <div id="power-bar-available" class="absolute left-0 top-0 h-full bg-yellow-500" style="width: 0%"></div>
+                        <div id="power-bar-used" class="absolute left-0 top-0 h-full bg-red-500 opacity-80" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl font-orbitron text-d4ac0d mb-4 border-b-2 border-d4ac0d pb-2">Required Materials</h3>
+                <p class="text-sm text-gray-400 mb-4 italic">50% Deep Desert discount has been applied.</p>
+                <div id="materials-list" class="space-y-2 pr-2">
+                    <p class="text-gray-500">Add items to see required materials.</p>
+                </div>
+                <div class="mt-4">
+                    <h4 class="text-lg font-orbitron text-d4ac0d mb-2">Selected Items</h4>
+                    <div id="selected-items-list" class="space-y-1"></div>
+                </div>
+                <div class="mt-6 border-t-2 border-gray-700 pt-4 flex justify-between items-center">
+                    <h4 class="text-xl font-bold">Total Items: <span id="total-items-count">0</span></h4>
+                    <button id="reset-btn" class="btn btn-secondary py-2 px-4 rounded-lg">Reset All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Apartment Planner Modal -->
+     <div id="apartment-modal" class="fixed inset-0 modal-bg z-40 items-center justify-center hidden">
+          <div class="bg-gray-800 p-8 rounded-lg shadow-2xl w-full max-w-lg m-4">
+                <h2 class="text-2xl font-orbitron text-d4ac0d mb-6">Apartment Planner</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div class="md:col-span-2">
+                          <label for="num-people" class="block mb-2 font-semibold">Number of People (Apartments):</label>
+                          <input type="number" id="num-people" min="1" value="1" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-d4ac0d">
+                      </div>
+                      <div>
+                          <label for="plastone-per" class="block mb-2 font-semibold">Plastone per Apartment</label>
+                          <input type="number" id="plastone-per" min="0" value="0" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-d4ac0d">
+                      </div>
+                      <div>
+                          <label for="granite-per" class="block mb-2 font-semibold">Granite per Apartment</label>
+                          <input type="number" id="granite-per" min="0" value="0" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-d4ac0d">
+                      </div>
+                      <div>
+                          <label for="salvaged-per" class="block mb-2 font-semibold">Salvaged Metal per Apartment</label>
+                          <input type="number" id="salvaged-per" min="0" value="0" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-d4ac0d">
+                      </div>
+                      <div>
+                          <label for="iron-per" class="block mb-2 font-semibold">Iron per Apartment</label>
+                          <input type="number" id="iron-per" min="0" value="0" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-d4ac0d">
+                      </div>
+                      <div>
+                          <label for="agave-per" class="block mb-2 font-semibold">Agave Seeds per Apartment</label>
+                          <input type="number" id="agave-per" min="0" value="0" class="w-full bg-gray-700 border border-gray-600 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-d4ac0d">
+                      </div>
+                </div>
+                <div class="mt-8 flex justify-end gap-4">
+                     <button id="cancel-apartment" class="btn btn-secondary py-2 px-4 rounded-lg">Cancel</button>
+                     <button id="add-apartment-mats" class="btn btn-primary py-2 px-4 rounded-lg">Apply</button>
+                </div>
+          </div>
+     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Element Selection ---
+            const dom = {
+                // Data Management
+                dataStatus: document.getElementById('data-status'),
+                placeholderTitle: document.getElementById('placeholder-title'),
+                placeholderText: document.getElementById('placeholder-text'),
+                // Calculator UI
+                itemGrid: document.getElementById('item-grid'),
+                itemGridPlaceholder: document.getElementById('item-grid-placeholder'),
+                materialsList: document.getElementById('materials-list'),
+                selectedItemsList: document.getElementById('selected-items-list'),
+                tierFilter: document.getElementById('tier-filter'),
+                searchInput: document.getElementById('search-input'),
+                totalItemsCount: document.getElementById('total-items-count'),
+                resetBtn: document.getElementById('reset-btn'),
+                // Power UI
+                powerAvailable: document.getElementById('power-available'),
+                powerUsed: document.getElementById('power-used'),
+                powerBalance: document.getElementById('power-balance'),
+                powerBarAvailable: document.getElementById('power-bar-available'),
+                powerBarUsed: document.getElementById('power-bar-used'),
+                // Apartment Planner
+                apartmentPlannerBtn: document.getElementById('apartment-planner-btn'),
+                apartmentModal: document.getElementById('apartment-modal'),
+                cancelApartmentBtn: document.getElementById('cancel-apartment'),
+                addApartmentMatsBtn: document.getElementById('add-apartment-mats'),
+                // Apartment fields
+                aptNumPeople: document.getElementById('num-people'),
+                aptPlastone: document.getElementById('plastone-per'),
+                aptGranite: document.getElementById('granite-per'),
+                aptSalvaged: document.getElementById('salvaged-per'),
+                aptIron: document.getElementById('iron-per'),
+                aptAgave: document.getElementById('agave-per'),
+            };
+
+            // --- State and Constants ---
+            let allItems = [];
+            let selectedItems = {};
+            let apartmentConfig = { apartments: 0, per: { "Plastone": 0, "Granite": 0, "Salvaged Metal": 0, "Iron": 0, "Agave Seeds": 0 } };
+            const DEEP_DESERT_DISCOUNT = 0.5;
+            const TIER_METALS_ORDERED = ["copper", "iron", "steel", "aluminum", "duraluminum", "plastinium"];
+
+            // --- Event Listeners ---
+            dom.tierFilter.addEventListener('change', () => displayItems());
+            dom.searchInput.addEventListener('input', () => displayItems());
+            dom.resetBtn.addEventListener('click', resetCalculator);
+            dom.itemGrid.addEventListener('click', handleItemGridClick);
+            dom.apartmentPlannerBtn.addEventListener('click', () => dom.apartmentModal.classList.replace('hidden', 'flex'));
+            dom.cancelApartmentBtn.addEventListener('click', () => dom.apartmentModal.classList.replace('flex', 'hidden'));
+            dom.addApartmentMatsBtn.addEventListener('click', applyApartmentPlan);
+            
+            // --- Data Loading ---
+            function loadInitialData() {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', `items_data.json?v=${new Date().getTime()}`, true);
+
+                xhr.onprogress = function () {
+                    updateDataStatus('Loading data...', false);
+                };
+
+                xhr.onload = function () {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            updateDataStatus('Parsing data...', false);
+                            const data = JSON.parse(xhr.responseText);
+                            processAndInitializeData(data);
+                        } catch (e) {
+                            updateDataStatus(`Error parsing JSON: ${e.message}`, true);
+                            dom.placeholderTitle.textContent = 'Error Loading Data';
+                            dom.placeholderText.innerHTML = `Could not parse <code>items_data.json</code>. Ensure it is a valid JSON file.`;
+                        }
+                    } else {
+                        updateDataStatus(`items_data.json not found (HTTP ${xhr.status}).`, true);
+                        dom.placeholderTitle.textContent = 'No Data Found';
+                        dom.placeholderText.innerHTML = `Run <code>get_data.py</code> to generate <code>items_data.json</code>, then refresh this page.`;
+                    }
+                };
+
+                xhr.onerror = function () {
+                    updateDataStatus('Could not load items_data.json.', true);
+                    dom.placeholderTitle.textContent = 'No Data Found';
+                    dom.placeholderText.innerHTML = `Run <code>get_data.py</code> to generate <code>items_data.json</code>, start a local server, then refresh.`;
+                };
+                
+                xhr.send();
+            }
+
+            // --- Data Processing and UI Initialization ---
+            function processAndInitializeData(data) {
+                if (!Array.isArray(data)) {
+                    updateDataStatus("Error: Loaded data is not a valid array.", true);
+                    return;
+                }
+                
+                allItems = data.filter(item => item.Recipe && Array.isArray(item.Recipe) && item.Recipe.length > 0);
+                allItems.forEach(item => {
+                    item.CalculatedTier = getItemTier(item);
+                });
+
+                populateTiers();
+                displayItems();
+                resetCalculator();
+                
+                // Enable UI
+                dom.searchInput.disabled = false;
+                dom.tierFilter.disabled = false;
+                dom.apartmentPlannerBtn.disabled = false;
+                dom.itemGridPlaceholder.classList.add('hidden');
+                updateDataStatus(`Successfully loaded ${allItems.length} craftable items.`, false);
+                updatePower();
+            }
+
+            function updateDataStatus(message, isError = false) {
+                dom.dataStatus.textContent = message;
+                dom.dataStatus.style.color = isError ? '#f87171' : '#dc2626';
+            }
+
+            function getItemTier(item) {
+                let highestTier = null;
+                let highestTierIndex = -1;
+                const searchStrings = [item.Name, ...(item.Recipe?.map(i => i.Name) || [])];
+
+                for (const str of searchStrings) {
+                    for (let i = TIER_METALS_ORDERED.length - 1; i >= 0; i--) {
+                        const metal = TIER_METALS_ORDERED[i];
+                        if (i > highestTierIndex && str.toLowerCase().includes(metal)) {
+                            highestTier = metal;
+                            highestTierIndex = i;
+                        }
+                    }
+                }
+                return highestTier ? highestTier.charAt(0).toUpperCase() + highestTier.slice(1) : "Basic";
+            }
+
+            // --- UI Population and Updates ---
+            function populateTiers() {
+                const tiers = ["Basic", ...TIER_METALS_ORDERED.map(t => t.charAt(0).toUpperCase() + t.slice(1))];
+                dom.tierFilter.innerHTML = '<option value="all">All Tiers</option>';
+                tiers.forEach(tier => {
+                    const option = document.createElement('option');
+                    option.value = tier;
+                    option.textContent = tier;
+                    dom.tierFilter.appendChild(option);
+                });
+            }
+
+            function displayItems() {
+                dom.itemGrid.innerHTML = '';
+                if (allItems.length === 0) {
+                    dom.itemGrid.appendChild(dom.itemGridPlaceholder);
+                    dom.itemGridPlaceholder.classList.remove('hidden');
+                    return;
+                }
+
+                const selectedTier = dom.tierFilter.value;
+                const searchTerm = dom.searchInput.value.toLowerCase();
+                let filteredItems = allItems;
+
+                if (selectedTier !== 'all') filteredItems = filteredItems.filter(item => item.CalculatedTier === selectedTier);
+                if (searchTerm) filteredItems = filteredItems.filter(item => item.Name.toLowerCase().includes(searchTerm));
+
+                if (filteredItems.length === 0) {
+                    dom.itemGrid.innerHTML = `<p class="text-gray-400 text-center col-span-full">No items match filters.</p>`;
+                    return;
+                }
+
+                filteredItems.forEach(item => {
+            const card = document.createElement('div');
+                    card.className = 'card rounded-lg p-4 flex flex-col justify-between';
+                    const recipeHtml = item.Recipe.map(mat => `<span>${mat.Name}: ${mat.Count}</span>`).join('<br>');
+                    card.innerHTML = `
+                        <div>
+                            <h4 class="text-xl font-bold font-orbitron text-f0e6d2">${item.Name}</h4>
+                            <p class="text-sm text-gray-400 mb-2">Tier: ${item.CalculatedTier || 'N/A'}</p>
+                            <div class="text-sm space-y-1 mb-4">${recipeHtml || 'No recipe found'}</div>
+                        </div>
+                        <div class="flex items-center justify-end gap-2 mt-auto">
+                            <button class="btn btn-secondary w-8 h-8 rounded-full remove-item" data-item-name="${item.Name}">-</button>
+                <span class="text-lg font-bold w-10 text-center item-count" data-item-name="${item.Name}">${selectedItems[item.Name] || 0}</span>
+                            <button class="btn btn-primary w-8 h-8 rounded-full add-item" data-item-name="${item.Name}">+</button>
+                        </div>`;
+                    dom.itemGrid.appendChild(card);
+                });
+            }
+
+            function updateMaterialsList() {
+                const totalMaterials = {};
+                Object.entries(selectedItems).forEach(([itemName, count]) => {
+                    const itemData = allItems.find(i => i.Name === itemName);
+                    if (itemData && count > 0) {
+                        itemData.Recipe.forEach(material => {
+                            totalMaterials[material.Name] = (totalMaterials[material.Name] || 0) + (material.Count * count);
+                        });
+                    }
+                });
+
+                // Add apartment-derived materials
+                if (apartmentConfig.apartments > 0) {
+                    Object.entries(apartmentConfig.per).forEach(([mat, perApt]) => {
+                        const add = (parseInt(perApt, 10) || 0) * apartmentConfig.apartments;
+                        if (add > 0) {
+                            totalMaterials[mat] = (totalMaterials[mat] || 0) + add;
+                        }
+                    });
+                }
+
+                dom.materialsList.innerHTML = '';
+                const sortedMaterials = Object.keys(totalMaterials).sort();
+                if (sortedMaterials.length === 0) {
+                    dom.materialsList.innerHTML = '<p class="text-gray-500">Add items to see required materials.</p>';
+                } else {
+                    sortedMaterials.forEach(matName => {
+                        const discountedAmount = Math.ceil(totalMaterials[matName] * DEEP_DESERT_DISCOUNT);
+                        dom.materialsList.innerHTML += `<div class="flex justify-between items-center bg-gray-700 p-2 rounded"><span>${matName}</span><span class="font-bold text-d4ac0d">${discountedAmount.toLocaleString()}</span></div>`;
+                    });
+                }
+                // Update selected items list
+                dom.selectedItemsList.innerHTML = '';
+                const entries = Object.entries(selectedItems).filter(([,count]) => count > 0);
+                if (entries.length === 0) {
+                    dom.selectedItemsList.innerHTML = '<p class="text-gray-500">No items selected.</p>';
+                } else {
+                    entries.sort((a,b) => a[0].localeCompare(b[0])).forEach(([name, count]) => {
+                        const row = document.createElement('div');
+                        row.className = 'flex justify-between items-center bg-gray-700 px-2 py-1 rounded';
+                        row.innerHTML = `<span>${name}</span><span class="font-bold">${count}</span>`;
+                        dom.selectedItemsList.appendChild(row);
+                    });
+                }
+
+                // Append Apartments count if set
+                if (apartmentConfig.apartments > 0) {
+                    const row = document.createElement('div');
+                    row.className = 'flex justify-between items-center bg-gray-700 px-2 py-1 rounded';
+                    row.innerHTML = `<span>Apartments</span><span class="font-bold">${apartmentConfig.apartments}</span>`;
+                    dom.selectedItemsList.appendChild(row);
+                }
+
+                dom.totalItemsCount.textContent = Object.values(selectedItems).reduce((sum, count) => sum + count, 0);
+                updatePower();
+            }
+
+            function updatePower() {
+                // Sum power provided and consumed
+                let provides = 0;
+                let consumes = 0;
+                Object.entries(selectedItems).forEach(([itemName, count]) => {
+                    const item = allItems.find(i => i.Name === itemName);
+                    if (!item || count <= 0) return;
+                    const p = (item.Power && typeof item.Power.Provides === 'number') ? item.Power.Provides : 0;
+                    const c = (item.Power && typeof item.Power.Consumes === 'number') ? item.Power.Consumes : 0;
+                    provides += p * count;
+                    consumes += c * count;
+                });
+
+                dom.powerAvailable.textContent = provides;
+                dom.powerUsed.textContent = consumes;
+                const balance = provides - consumes;
+                dom.powerBalance.textContent = balance;
+                dom.powerBalance.style.color = balance < 0 ? '#f87171' : '#22c55e';
+
+                // Normalize bar widths by the max of both
+                const maxVal = Math.max(provides, consumes, 1);
+                const availPct = Math.min(100, Math.round((provides / maxVal) * 100));
+                const usedPct = Math.min(100, Math.round((consumes / maxVal) * 100));
+                dom.powerBarAvailable.style.width = `${availPct}%`;
+                dom.powerBarUsed.style.width = `${usedPct}%`;
+                dom.powerBarUsed.style.opacity = consumes > provides ? '1' : '0.8';
+            }
+            
+            // --- Event Handlers and Logic ---
+            function resetCalculator() {
+                selectedItems = {};
+                apartmentConfig = { apartments: 0, per: { "Plastone": 0, "Granite": 0, "Salvaged Metal": 0, "Iron": 0, "Agave Seeds": 0 } };
+                if(allItems.length > 0) {
+                    displayItems();
+                }
+                updateMaterialsList();
+            }
+
+            function handleItemGridClick(e) {
+                const target = e.target;
+                const itemName = target.dataset.itemName;
+                if (!itemName) return;
+
+                if (target.classList.contains('add-item')) {
+                    selectedItems[itemName] = (selectedItems[itemName] || 0) + 1;
+                } else if (target.classList.contains('remove-item')) {
+                    if (selectedItems[itemName] > 0) {
+                        selectedItems[itemName]--;
+                        if (selectedItems[itemName] === 0) delete selectedItems[itemName];
+                    }
+                }
+                const safeName = CSS.escape(itemName);
+                const countSpan = dom.itemGrid.querySelector(`.item-count[data-item-name="${safeName}"]`);
+                if (countSpan) {
+                    countSpan.textContent = selectedItems[itemName] || 0;
+                }
+                updateMaterialsList();
+            }
+
+            function applyApartmentPlan() {
+                const people = parseInt(dom.aptNumPeople.value, 10) || 0;
+                if (people <= 0) {
+                    dom.apartmentModal.classList.replace('flex', 'hidden');
+                    return;
+                }
+                // Update config
+                apartmentConfig.apartments = people;
+                apartmentConfig.per = {
+                    'Plastone': parseInt(dom.aptPlastone.value, 10) || 0,
+                    'Granite': parseInt(dom.aptGranite.value, 10) || 0,
+                    'Salvaged Metal': parseInt(dom.aptSalvaged.value, 10) || 0,
+                    'Iron': parseInt(dom.aptIron.value, 10) || 0,
+                    'Agave Seeds': parseInt(dom.aptAgave.value, 10) || 0,
+                };
+                updateMaterialsList();
+                dom.apartmentModal.classList.replace('flex', 'hidden');
+            }
+
+            // --- Data File Management ---
+            // (upload removed; JSON auto-loads if present)
+
+            // --- Kick off data load ---
+            try {
+                loadInitialData();
+            } catch (e) {
+                console.error('Failed to start data load:', e);
+            }
+        });
+    </script>
+</body>
+</html>

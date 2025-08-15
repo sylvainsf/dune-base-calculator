@@ -77,15 +77,100 @@ def _parse_quantity_and_name(text):
     return None, None
 
 
+def _extract_int(text):
+    m = re.search(r"\d+", text or "")
+    return int(m.group(0)) if m else None
+
+
+def parse_power_from_page(soup):
+    """Parse power provided/consumed from infobox-like tables or text patterns."""
+    provides = 0
+    consumes = 0
+    ambiguous_vals = []
+
+    # Determine if this page looks like a generator (by title)
+    page_title = ""
+    h1 = soup.find('h1')
+    if h1:
+        page_title = h1.get_text(" ", strip=True)
+    elif soup.title:
+        page_title = soup.title.get_text(" ", strip=True)
+    is_generator_page = 'generator' in (page_title or '').lower()
+
+    # Table-based extraction: scan rows for power labels
+    LABELS_CONSUME = [
+        "power draw", "power consumption", "consumption", "consumes",
+        "power required", "required power", "power requirement", "use", "usage"
+    ]
+    LABELS_PROVIDE = [
+        "power provided", "power output", "power generation", "generates", "generated", "provided power", "generator output", "produces", "produced"
+    ]
+
+    for row in soup.find_all('tr'):
+        # Get label and value cells
+        label_el = row.find('th') or (row.find_all('td')[0] if len(row.find_all('td')) >= 2 else None)
+        value_el = None
+        tds = row.find_all('td')
+        if len(tds) >= 2:
+            value_el = tds[1]
+        elif len(tds) == 1 and row.find('th'):
+            value_el = tds[0]
+
+        if not label_el or not value_el:
+            continue
+
+        label = label_el.get_text(" ", strip=True).lower()
+        val_text = value_el.get_text(" ", strip=True)
+        # If label clearly indicates provide, prefer that over consume
+        if any(lbl in label for lbl in LABELS_PROVIDE):
+            n = _extract_int(val_text)
+            if n:
+                provides = max(provides, n)
+            continue
+        if any(lbl in label for lbl in LABELS_CONSUME):
+            n = _extract_int(val_text)
+            if n:
+                consumes = max(consumes, n)
+            continue
+        # Ambiguous generic 'power' label; collect for later decision
+        if 'power' in label:
+            n = _extract_int(val_text)
+            if n:
+                ambiguous_vals.append(n)
+
+    # Text-based fallback
+    page_text = soup.get_text(" ", strip=True)
+    m_cons = re.search(r"power\s*(?:draw|consumption|required|requirement|use|usage)\s*[:=]?\s*(\d+)", page_text, flags=re.I)
+    m_prov = re.search(r"power\s*(?:provided|output|generation|generated|produced|produces)\s*[:=]?\s*(\d+)", page_text, flags=re.I)
+    if m_prov and provides == 0:
+        provides = int(m_prov.group(1))
+    if m_cons and consumes == 0 and not m_prov:
+        consumes = int(m_cons.group(1))
+
+    # Resolve ambiguous values if neither side detected via clear labels
+    if ambiguous_vals and provides == 0 and consumes == 0:
+        if is_generator_page:
+            provides = max(ambiguous_vals)
+        else:
+            consumes = max(ambiguous_vals)
+
+    print(f"[power] provides={provides}, consumes={consumes}")
+    # Heuristic: if an item both provides and consumes, treat it as a generator (consumption likely misclassified)
+    if provides > 0 and consumes > 0:
+        print("[power] Heuristic applied: provides>0 and consumes>0; setting consumes=0 for generator.")
+        consumes = 0
+    return {"Provides": int(provides or 0), "Consumes": int(consumes or 0)}
+
+
 def scrape_recipe_from_page(url):
-    """Scrapes an item page to extract its recipe using the 'Build Cost' section first, with debug logs."""
+    """Scrapes an item page to extract its recipe and power using the 'Build Cost' section first, with debug logs."""
     headers = {'User-Agent': USER_AGENT}
     try:
         response = requests.get(url, headers=headers, timeout=30)
         response.raise_for_status()
         print(f"[page] GET {url} -> HTTP {response.status_code}, bytes={len(response.content)}")
         soup = BeautifulSoup(response.content, 'html.parser')
-        
+
         recipe = []
 
         # 1) Preferred: Build Cost section (h2/h3 with span id or text 'Build Cost')
@@ -196,7 +281,6 @@ def scrape_recipe_from_page(url):
                             continue
 
                         # Standard two-cell rows
-                        
                         if len(cells) >= 2:
                             item_cell, quantity_cell = cells[0], cells[1]
                             link = item_cell.find('a')
@@ -319,8 +403,9 @@ def scrape_recipe_from_page(url):
                 snippet = " | ".join(sib_texts)[:240]
             print(f"[parse] WARNING: No recipe parsed for {url}. via={parsed_via or 'n/a'} snippet='{snippet or 'none'}'")
 
-        return recipe
-        
+        power = parse_power_from_page(soup)
+        return {"Recipe": recipe, "Power": power}
+
     except requests.exceptions.RequestException as e:
         print(f"[page] ERROR: Could not scrape page {url}: {e}")
         return None
@@ -335,15 +420,16 @@ def main():
         for i, link in enumerate(item_links):
             print(f"[item] Processing {i+1}/{len(item_links)}: {link}")
             
-            recipe = scrape_recipe_from_page(link)
+            result = scrape_recipe_from_page(link)
             
             # Get item name from the end of the link
             name = unquote(link.split('/')[-1]).replace('_', ' ').strip()
             
-            if recipe is not None:
+            if result is not None:
                 item_data = {
                     "Name": name,
-                    "Recipe": recipe
+                    "Recipe": result.get("Recipe", []),
+                    "Power": result.get("Power", {"Provides": 0, "Consumes": 0})
                 }
                 all_item_data.append(item_data)
             
