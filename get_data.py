@@ -162,6 +162,69 @@ def parse_power_from_page(soup):
     return {"Provides": int(provides or 0), "Consumes": int(consumes or 0)}
 
 
+def parse_water_capacity_from_page(soup):
+    """Parse water capacity (in liters) from infobox-like tables or text.
+    Heuristics:
+      - Prefer table rows whose label mentions water/liquid and capacity/storage/volume.
+      - Or generic capacity/storage rows whose value contains L/liter(s).
+      - Fallback to text search near 'water/liquid ... capacity/storage/volume ... <num> L'.
+    Returns an integer number of liters (default 0 if not found).
+    """
+    capacity_l = 0
+
+    def _parse_liters(s: str):
+        if not s:
+            return None
+        # Accept numbers with commas or decimals followed by optional L/liter keywords
+        m = re.search(r"(\d[\d,\.]*)\s*(?:l\b|litre\b|liter\b|liters\b|litres\b)?", s, flags=re.I)
+        if m:
+            num = m.group(1).replace(",", "")
+            try:
+                return int(float(num))
+            except ValueError:
+                return None
+        return None
+
+    for row in soup.find_all('tr'):
+        tds = row.find_all('td')
+        label_el = row.find('th') or (tds[0] if len(tds) >= 2 else None)
+        value_el = (tds[1] if len(tds) >= 2 else (tds[0] if len(tds) == 1 and row.find('th') else None))
+        if not label_el or not value_el:
+            continue
+        label = label_el.get_text(" ", strip=True).lower()
+        val_text = value_el.get_text(" ", strip=True)
+
+        label_has_water = any(w in label for w in ("water", "liquid"))
+        label_has_capacity = any(w in label for w in ("capacity", "storage", "volume", "tank"))
+        val_mentions_liters = re.search(r"\b(l|liter|litre|liters|litres)\b", val_text, flags=re.I)
+
+        liters = None
+        if label_has_water and label_has_capacity:
+            liters = _parse_liters(val_text)
+        elif ("capacity" in label or "storage" in label) and val_mentions_liters:
+            liters = _parse_liters(val_text)
+
+        if liters is not None:
+            capacity_l = max(capacity_l, liters)
+
+    if capacity_l == 0:
+        # Text-based fallback
+        text = soup.get_text(" ", strip=True)
+        m = re.search(
+            r"(water|liquid)[^\n]{0,40}?(capacity|storage|volume)[^\n]{0,15}?(\d[\d,\.]*)\s*(l|liter|litre|liters|litres)",
+            text,
+            flags=re.I,
+        )
+        if m:
+            try:
+                capacity_l = int(float(m.group(3).replace(",", "")))
+            except ValueError:
+                capacity_l = 0
+
+    print(f"[water] capacity_liters={capacity_l}")
+    return int(capacity_l or 0)
+
+
 def scrape_recipe_from_page(url):
     """Scrapes an item page to extract its recipe and power using the 'Build Cost' section first, with debug logs."""
     headers = {'User-Agent': USER_AGENT}
@@ -404,7 +467,8 @@ def scrape_recipe_from_page(url):
             print(f"[parse] WARNING: No recipe parsed for {url}. via={parsed_via or 'n/a'} snippet='{snippet or 'none'}'")
 
         power = parse_power_from_page(soup)
-        return {"Recipe": recipe, "Power": power}
+        water_capacity = parse_water_capacity_from_page(soup)
+        return {"Recipe": recipe, "Power": power, "WaterCapacity": water_capacity}
 
     except requests.exceptions.RequestException as e:
         print(f"[page] ERROR: Could not scrape page {url}: {e}")
@@ -429,7 +493,8 @@ def main():
                 item_data = {
                     "Name": name,
                     "Recipe": result.get("Recipe", []),
-                    "Power": result.get("Power", {"Provides": 0, "Consumes": 0})
+                    "Power": result.get("Power", {"Provides": 0, "Consumes": 0}),
+                    "WaterCapacity": int(result.get("WaterCapacity", 0))
                 }
                 all_item_data.append(item_data)
             

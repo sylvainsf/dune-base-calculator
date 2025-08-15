@@ -70,9 +70,12 @@
         <header class="text-center mb-8">
             <h1 class="text-4xl lg:text-5xl font-orbitron text-d4ac0d mb-2">Dune: Awakening</h1>
             <h2 class="text-2xl lg:text-3xl font-orbitron text-f0e6d2">Base Calculator</h2>
-            <div class="mt-4 flex justify-center">
-                <a href="https://donate.cancer.org/" target="_blank" rel="noopener noreferrer" class="btn btn-primary py-2 px-4 rounded-lg">
+            <div class="mt-4 flex flex-col sm:flex-row justify-center gap-3">
+                <a href="https://donate.cancer.org/" target="_blank" rel="noopener noreferrer" class="btn btn-primary py-2 px-4 rounded-lg text-center">
                     If you like this tool, please consider supporting the American Cancer Society
+                </a>
+                <a href="https://github.com/sylvainsf/dune-base-calculator/issues/new/choose" target="_blank" rel="noopener noreferrer" class="btn btn-secondary py-2 px-4 rounded-lg text-center">
+                    Got suggestions for improvements?
                 </a>
             </div>
         </header>
@@ -126,6 +129,20 @@
                     <div class="h-3 bg-gray-700 rounded relative overflow-hidden">
                         <div id="power-bar-available" class="absolute left-0 top-0 h-full bg-yellow-500" style="width: 0%"></div>
                         <div id="power-bar-used" class="absolute left-0 top-0 h-full bg-red-500 opacity-80" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Water Capacity Widget -->
+                <div class="mb-6">
+                    <h3 class="text-2xl font-orbitron mb-2 flex items-center gap-2"><span>💧</span> Water Capacity</h3>
+                    <div class="flex items-center justify-between text-sm mb-2">
+                        <div>
+                            <span class="text-gray-300">Capacity (L):</span>
+                            <span id="water-capacity" class="font-bold">0</span>
+                        </div>
+                    </div>
+                    <div class="h-3 bg-gray-700 rounded relative overflow-hidden">
+                        <div id="water-bar" class="absolute left-0 top-0 h-full" style="width: 0%; background-color: #3b82f6"></div>
                     </div>
                 </div>
 
@@ -206,6 +223,9 @@
                 powerBalance: document.getElementById('power-balance'),
                 powerBarAvailable: document.getElementById('power-bar-available'),
                 powerBarUsed: document.getElementById('power-bar-used'),
+                // Water UI
+                waterCapacity: document.getElementById('water-capacity'),
+                waterBar: document.getElementById('water-bar'),
                 // Apartment Planner
                 apartmentPlannerBtn: document.getElementById('apartment-planner-btn'),
                 apartmentModal: document.getElementById('apartment-modal'),
@@ -295,6 +315,7 @@
                 dom.itemGridPlaceholder.classList.add('hidden');
                 updateDataStatus(`Successfully loaded ${allItems.length} craftable items.`, false);
                 updatePower();
+                updateWater();
             }
 
             function updateDataStatus(message, isError = false) {
@@ -425,6 +446,7 @@
 
                 dom.totalItemsCount.textContent = Object.values(selectedItems).reduce((sum, count) => sum + count, 0);
                 updatePower();
+                updateWater();
             }
 
             function updatePower() {
@@ -453,6 +475,22 @@
                 dom.powerBarAvailable.style.width = `${availPct}%`;
                 dom.powerBarUsed.style.width = `${usedPct}%`;
                 dom.powerBarUsed.style.opacity = consumes > provides ? '1' : '0.8';
+            }
+
+            function updateWater() {
+                // Sum water capacities from selected items. If none have capacity, keep zero.
+                let totalL = 0;
+                Object.entries(selectedItems).forEach(([itemName, count]) => {
+                    const item = allItems.find(i => i.Name === itemName);
+                    if (!item || count <= 0) return;
+                    const cap = (typeof item.WaterCapacity === 'number') ? item.WaterCapacity : 0;
+                    if (cap > 0) totalL += cap * count;
+                });
+                dom.waterCapacity.textContent = totalL.toLocaleString();
+                // Blue bar: normalize vs a soft cap for visualization. Use max of 10,000L or total.
+                const denom = Math.max(10000, totalL, 1);
+                const pct = Math.min(100, Math.round((totalL / denom) * 100));
+                dom.waterBar.style.width = `${pct}%`;
             }
             
             // --- Event Handlers and Logic ---

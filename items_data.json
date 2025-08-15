@@ -18,7 +18,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 350
-        }
+        },
+        "WaterCapacity": 500
     },
     {
         "Name": "Advanced Garment Fabricator",
@@ -51,7 +52,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 1
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Advanced Sub-Fief Console",
@@ -64,7 +66,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 15
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Advanced Survival Fabricator",
@@ -97,7 +100,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 6
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Advanced Vehicle Fabricator",
@@ -130,7 +134,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 6
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Advanced Weapons Fabricator",
@@ -163,7 +168,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 28
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Blood Purifier",
@@ -176,7 +182,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 10
-        }
+        },
+        "WaterCapacity": 1000
     },
     {
         "Name": "Chest",
@@ -189,7 +196,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 0
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Fabricator",
@@ -202,7 +210,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 5
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Fremen Deathstill",
@@ -223,7 +232,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 200
-        }
+        },
+        "WaterCapacity": 500
     },
     {
         "Name": "Garment Fabricator",
@@ -240,7 +250,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 1
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Improved Blood Purifier",
@@ -261,7 +272,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 35
-        }
+        },
+        "WaterCapacity": 1000
     },
     {
         "Name": "Large Ore Refinery",
@@ -294,7 +306,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 350
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Large Spice Refinery",
@@ -327,7 +340,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 500
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Large Water Cistern",
@@ -348,7 +362,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 0
-        }
+        },
+        "WaterCapacity": 100000
     },
     {
         "Name": "Large Windtrap",
@@ -373,7 +388,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 135
-        }
+        },
+        "WaterCapacity": 500
     },
     {
         "Name": "Medium Chemical Refinery",
@@ -398,7 +414,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 350
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Medium Ore Refinery",
@@ -419,7 +436,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 45
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Medium Spice Refinery",
@@ -448,7 +466,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 350
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Medium Storage Container",
@@ -469,7 +488,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 0
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Medium Water Cistern",
@@ -486,7 +506,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 0
-        }
+        },
+        "WaterCapacity": 25000
     },
     {
         "Name": "Recycler",
@@ -499,7 +520,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 15
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Repair Station",
@@ -512,7 +534,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 20
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Small Chemical Refinery",
@@ -525,7 +548,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 15
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Small Ore Refinery",
@@ -538,7 +562,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 15
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Small Storage Container",
@@ -551,7 +576,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 0
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Spice Refinery",
@@ -576,7 +602,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 200
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Spice-Powered Generator",
@@ -609,7 +636,8 @@
         "Power": {
             "Provides": 1000,
             "Consumes": 0
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Storage Container",
@@ -626,7 +654,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 0
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Sub-Fief Console",
@@ -639,7 +668,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 15
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Survival Fabricator",
@@ -656,7 +686,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 5
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Vehicles Fabricator",
@@ -673,7 +704,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 5
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Weapons Fabricator",
@@ -690,7 +722,8 @@
         "Power": {
             "Provides": 0,
             "Consumes": 94
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Wind Turbine Directional",
@@ -715,7 +748,8 @@
         "Power": {
             "Provides": 350,
             "Consumes": 0
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Wind Turbine Omnidirectional",
@@ -736,7 +770,8 @@
         "Power": {
             "Provides": 150,
             "Consumes": 0
-        }
+        },
+        "WaterCapacity": 0
     },
     {
         "Name": "Windtrap",
@@ -757,6 +792,7 @@
         "Power": {
             "Provides": 0,
             "Consumes": 75
-        }
+        },
+        "WaterCapacity": 500
     }
 ]
