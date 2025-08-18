@@ -20,6 +20,7 @@
             "Consumes": 350
         },
         "WaterCapacity": 500,
+        "WaterPerMinute": 0.9,
         "Consumables": []
     },
     {
@@ -55,6 +56,7 @@
             "Consumes": 1
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -70,6 +72,7 @@
             "Consumes": 15
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -105,6 +108,7 @@
             "Consumes": 6
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -140,6 +144,7 @@
             "Consumes": 6
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -175,6 +180,7 @@
             "Consumes": 28
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": [
             {
                 "Name": "Missile",
@@ -195,6 +201,7 @@
             "Consumes": 10
         },
         "WaterCapacity": 1000,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -210,6 +217,7 @@
             "Consumes": 0
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -225,6 +233,7 @@
             "Consumes": 5
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -248,6 +257,7 @@
             "Consumes": 200
         },
         "WaterCapacity": 500,
+        "WaterPerMinute": 0.4166666666666667,
         "Consumables": []
     },
     {
@@ -267,6 +277,7 @@
             "Consumes": 1
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -290,6 +301,7 @@
             "Consumes": 35
         },
         "WaterCapacity": 1000,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -325,6 +337,7 @@
             "Consumes": 350
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -360,6 +373,7 @@
             "Consumes": 500
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -383,6 +397,7 @@
             "Consumes": 0
         },
         "WaterCapacity": 100000,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -410,6 +425,7 @@
             "Consumes": 135
         },
         "WaterCapacity": 500,
+        "WaterPerMinute": 1.75,
         "Consumables": [
             {
                 "Name": "Particulate Filter",
@@ -417,7 +433,7 @@
             },
             {
                 "Name": "Advanced Particulate Filter",
-                "Hours": 1.0
+                "Hours": 24.0
             }
         ]
     },
@@ -446,6 +462,7 @@
             "Consumes": 350
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": [
             {
                 "Name": "Medium Sized Vehicle Fuel Cell",
@@ -494,6 +511,7 @@
             "Consumes": 45
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -525,6 +543,7 @@
             "Consumes": 350
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -548,6 +567,7 @@
             "Consumes": 0
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -567,6 +587,7 @@
             "Consumes": 0
         },
         "WaterCapacity": 25000,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -582,6 +603,7 @@
             "Consumes": 15
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -597,6 +619,7 @@
             "Consumes": 20
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -612,6 +635,7 @@
             "Consumes": 15
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": [
             {
                 "Name": "Small Vehicle Fuel Cell",
@@ -644,6 +668,7 @@
             "Consumes": 15
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -659,6 +684,7 @@
             "Consumes": 0
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -686,6 +712,7 @@
             "Consumes": 200
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -721,10 +748,11 @@
             "Consumes": 0
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": [
             {
                 "Name": "Spice-infused Fuel Cell",
-                "Hours": 0.5
+                "Hours": 1.5
             }
         ]
     },
@@ -745,6 +773,7 @@
             "Consumes": 0
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -760,6 +789,7 @@
             "Consumes": 15
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -779,6 +809,7 @@
             "Consumes": 5
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -798,6 +829,7 @@
             "Consumes": 5
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": []
     },
     {
@@ -817,6 +849,7 @@
             "Consumes": 94
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": [
             {
                 "Name": "Incendiary Gel",
@@ -853,10 +886,11 @@
             "Consumes": 0
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": [
             {
                 "Name": "Industrial-grade Lubricant",
-                "Hours": 0.5
+                "Hours": 1.5
             }
         ]
     },
@@ -881,6 +915,7 @@
             "Consumes": 0
         },
         "WaterCapacity": 0,
+        "WaterPerMinute": 0.0,
         "Consumables": [
             {
                 "Name": "Low-grade Lubricant",
@@ -909,6 +944,7 @@
             "Consumes": 75
         },
         "WaterCapacity": 500,
+        "WaterPerMinute": 0.75,
         "Consumables": [
             {
                 "Name": "Makeshift Filter",
@@ -938,7 +974,7 @@
         ],
         "Power": {
             "Provides": 0,
-            "Consumes": 6
+            "Consumes": 0
         },
         "WaterCapacity": 0
     },
@@ -1064,6 +1100,36 @@
     },
     {
         "Name": "Standard Filter",
+        "Recipe": [],
+        "Power": {
+            "Provides": 0,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "IsConsumable": true
+    },
+    {
+        "Name": "Fuel Generator",
+        "Recipe": [
+            {
+                "Name": "Salvaged Metal",
+                "Count": 45
+            }
+        ],
+        "Power": {
+            "Provides": 75,
+            "Consumes": 0
+        },
+        "WaterCapacity": 0,
+        "Consumables": [
+            {
+                "Name": "Fuel Cells",
+                "Hours": 1.002
+            }
+        ]
+    },
+    {
+        "Name": "Fuel Cells",
         "Recipe": [],
         "Power": {
             "Provides": 0,

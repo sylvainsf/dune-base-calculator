@@ -110,7 +110,10 @@
                             <option value="all">All Tiers</option>
                         </select>
                     </div>
-                    <button id="apartment-planner-btn" class="btn btn-primary py-2 px-4 rounded-lg w-full sm:w-auto" disabled>Apartment Planner</button>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button id="apartment-planner-btn" class="btn btn-primary py-2 px-4 rounded-lg flex-1 sm:flex-none" disabled>Apartment Planner</button>
+                        <button id="pentashield-planner-btn" class="btn btn-secondary py-2 px-4 rounded-lg flex-1 sm:flex-none" disabled>Pentashield Planner</button>
+                    </div>
                 </div>
 
                 <!-- Item Grid -->
@@ -166,6 +169,18 @@
                     </div>
                     <div class="h-3 bg-gray-700 rounded relative overflow-hidden">
                         <div id="water-bar" class="absolute left-0 top-0 h-full" style="width: 0%; background-color: #3b82f6"></div>
+                    </div>
+                    <div class="mt-2 space-y-1 text-sm">
+                        <div>
+                            <span class="text-gray-300">Windtraps:</span>
+                            <span id="water-windtrap-lpm" class="font-bold">0</span>
+                            <span class="text-gray-300">L/min</span>
+                        </div>
+                        <div>
+                            <span class="text-gray-300">Deathstills:</span>
+                            <span id="water-deathstill-lph" class="font-bold">0</span>
+                            <span class="text-gray-300">L/hour</span>
+                        </div>
                     </div>
                 </div>
 
@@ -243,6 +258,23 @@
                 </div>
           </div>
      </div>
+
+    <!-- Pentashield Planner Modal -->
+    <div id="pentashield-modal" class="fixed inset-0 modal-bg z-40 items-center justify-center hidden">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-2xl w-full max-w-2xl m-4">
+             <h2 class="text-2xl font-orbitron text-d4ac0d mb-4">Pentashield Planner</h2>
+             <p class="text-sm text-gray-400 mb-4">Add one row per Pentashield. Vertical draws 6 power per square; Horizontal draws 3 power per square.</p>
+             <div class="mb-3 flex justify-between items-center">
+                 <button id="pent-add-row" class="btn btn-secondary py-1 px-3 rounded">+ Add Pentashield</button>
+                 <div id="pent-summary" class="text-sm text-gray-300"></div>
+             </div>
+             <div id="pent-rows" class="space-y-2 max-h-[50vh] overflow-y-auto"></div>
+             <div class="mt-6 flex justify-end gap-4">
+                 <button id="cancel-pentashield" class="btn btn-secondary py-2 px-4 rounded-lg">Cancel</button>
+                 <button id="add-pentashield-mats" class="btn btn-primary py-2 px-4 rounded-lg">Save</button>
+             </div>
+        </div>
+    </div>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -275,11 +307,21 @@
                 // Water UI
                 waterCapacity: document.getElementById('water-capacity'),
                 waterBar: document.getElementById('water-bar'),
+                waterWindtrapLpm: document.getElementById('water-windtrap-lpm'),
+                waterDeathstillLph: document.getElementById('water-deathstill-lph'),
                 // Apartment Planner
                 apartmentPlannerBtn: document.getElementById('apartment-planner-btn'),
                 apartmentModal: document.getElementById('apartment-modal'),
                 cancelApartmentBtn: document.getElementById('cancel-apartment'),
                 addApartmentMatsBtn: document.getElementById('add-apartment-mats'),
+                // Pentashield Planner
+                pentashieldPlannerBtn: document.getElementById('pentashield-planner-btn'),
+                pentashieldModal: document.getElementById('pentashield-modal'),
+                cancelPentashieldBtn: document.getElementById('cancel-pentashield'),
+                addPentashieldMatsBtn: document.getElementById('add-pentashield-mats'),
+                pentAddRowBtn: document.getElementById('pent-add-row'),
+                pentRows: document.getElementById('pent-rows'),
+                pentSummary: document.getElementById('pent-summary'),
                 // Consumables
                 consumableDays: document.getElementById('consumable-days'),
                 consumablesList: document.getElementById('consumables-list'),
@@ -297,8 +339,12 @@
             let allItems = [];
             let consumableCatalog = [];
             let selectedItems = {};
+            // Mapping equipment name -> chosen consumable name
+            let consumableChoice = {};
             let targetDays = 7;
             let apartmentConfig = { apartments: 0, per: { "Plastone": 0, "Granite": 0, "Salvaged Metal": 0, "Iron": 0, "Agave Seeds": 0 } };
+            let pentashieldConfig = { entries: [] }; // entries: [{orientation:'vertical'|'horizontal', squares:number}]
+            let pentWorking = null; // temp editor state
             const DEEP_DESERT_DISCOUNT = 0.5;
             let deepDesertEnabled = true;
             const TIER_METALS_ORDERED = ["copper", "iron", "steel", "aluminum", "duraluminum", "plastinium"];
@@ -311,6 +357,15 @@
             dom.apartmentPlannerBtn.addEventListener('click', () => dom.apartmentModal.classList.replace('hidden', 'flex'));
             dom.cancelApartmentBtn.addEventListener('click', () => dom.apartmentModal.classList.replace('flex', 'hidden'));
             dom.addApartmentMatsBtn.addEventListener('click', applyApartmentPlan);
+            if (dom.pentashieldPlannerBtn) {
+                dom.pentashieldPlannerBtn.addEventListener('click', openPentashieldModal);
+            }
+            if (dom.cancelPentashieldBtn) dom.cancelPentashieldBtn.addEventListener('click', () => dom.pentashieldModal.classList.replace('flex', 'hidden'));
+            if (dom.addPentashieldMatsBtn) dom.addPentashieldMatsBtn.addEventListener('click', applyPentashieldPlan);
+            if (dom.pentAddRowBtn) dom.pentAddRowBtn.addEventListener('click', () => { if (!pentWorking) pentWorking = []; pentWorking.push({orientation:'vertical', squares:0}); renderPentashieldEditor(); });
+            if (dom.pentRows) dom.pentRows.addEventListener('input', handlePentashieldRowInput);
+            if (dom.pentRows) dom.pentRows.addEventListener('change', handlePentashieldRowInput);
+            if (dom.pentRows) dom.pentRows.addEventListener('click', handlePentashieldRowClick);
             if (dom.exportBtn) dom.exportBtn.addEventListener('click', exportStateToFile);
             if (dom.importBtn && dom.importFile) {
                 dom.importBtn.addEventListener('click', () => dom.importFile.click());
@@ -330,6 +385,19 @@
                     targetDays = isNaN(v) || v < 0 ? 0 : v;
                     renderConsumablesList();
                     
+                });
+            }
+            if (dom.consumablesList) {
+                // Handle per-equipment consumable selection changes
+                dom.consumablesList.addEventListener('change', (e) => {
+                    const sel = e.target.closest('select[data-equip]');
+                    if (!sel) return;
+                    const equip = sel.getAttribute('data-equip');
+                    const value = sel.value;
+                    if (equip && value) {
+                        consumableChoice[equip] = value;
+                        renderConsumablesList();
+                    }
                 });
             }
             
@@ -396,6 +464,7 @@
                 dom.searchInput.disabled = false;
                 dom.tierFilter.disabled = false;
                 dom.apartmentPlannerBtn.disabled = false;
+                if (dom.pentashieldPlannerBtn) dom.pentashieldPlannerBtn.disabled = false;
                 dom.itemGridPlaceholder.classList.add('hidden');
                 updateDataStatus(`Successfully loaded ${allItems.length} craftable items.`, false);
                 updatePower();
@@ -451,7 +520,7 @@
 
                 const selectedTier = dom.tierFilter.value;
                 const searchTerm = dom.searchInput.value.toLowerCase();
-                let filteredItems = allItems;
+                let filteredItems = allItems.filter(i => i.Name !== 'Pentashield');
 
                 if (selectedTier !== 'all') filteredItems = filteredItems.filter(item => item.CalculatedTier === selectedTier);
                 if (searchTerm) filteredItems = filteredItems.filter(item => item.Name.toLowerCase().includes(searchTerm));
@@ -465,11 +534,28 @@
             const card = document.createElement('div');
                     card.className = 'card rounded-lg p-4 flex flex-col justify-between';
                     const recipeHtml = item.Recipe.map(mat => `<span>${mat.Name}: ${mat.Count}</span>`).join('<br>');
+                    const waterRate = typeof item.WaterPerMinute === 'number' && item.WaterPerMinute > 0 ? item.WaterPerMinute : null;
+                    const waterStr = (v) => {
+                        if (v == null) return '';
+                        const isInt = Math.abs(v - Math.round(v)) < 0.05;
+                        return isInt ? Math.round(v).toLocaleString() : v.toFixed(1);
+                    };
+                    let extraLine = '';
+                    if (waterRate) {
+                        const nm = (item.Name || '').toLowerCase();
+                        if (nm.includes('deathstill')) {
+                            const lph = waterRate * 60;
+                            extraLine = `<div class=\"text-sm text-blue-300 mt-1\">💧 ${waterStr(lph)} L/hour</div>`;
+                        } else {
+                            extraLine = `<div class=\"text-sm text-blue-300 mt-1\">💧 ${waterStr(waterRate)} L/min</div>`;
+                        }
+                    }
                     card.innerHTML = `
                         <div>
                             <h4 class="text-xl font-bold font-orbitron text-f0e6d2">${item.Name}</h4>
                             <p class="text-sm text-gray-400 mb-2">Tier: ${item.CalculatedTier || 'N/A'}</p>
-                            <div class="text-sm space-y-1 mb-4">${recipeHtml || 'No recipe found'}</div>
+                            <div class="text-sm space-y-1 mb-1">${recipeHtml || 'No recipe found'}</div>
+                            ${extraLine}
                         </div>
                         <div class="flex items-center justify-end gap-2 mt-auto">
                             <button class="btn btn-secondary w-8 h-8 rounded-full remove-item" data-item-name="${item.Name}">-</button>
@@ -501,6 +587,18 @@
                     });
                 }
 
+                // Add Pentashield-derived materials: one recipe per entry
+                if (pentashieldConfig.entries && pentashieldConfig.entries.length > 0) {
+                    const pent = allItems.find(i => i.Name === 'Pentashield');
+                    if (pent && Array.isArray(pent.Recipe)) {
+                        const count = pentashieldConfig.entries.length;
+                        pent.Recipe.forEach(material => {
+                            const add = (material.Count || 0) * count;
+                            if (add > 0) totalMaterials[material.Name] = (totalMaterials[material.Name] || 0) + add;
+                        });
+                    }
+                }
+
                 dom.materialsList.innerHTML = '';
                 const sortedMaterials = Object.keys(totalMaterials).sort();
                 if (sortedMaterials.length === 0) {
@@ -521,7 +619,31 @@
                     entries.sort((a,b) => a[0].localeCompare(b[0])).forEach(([name, count]) => {
                         const row = document.createElement('div');
                         row.className = 'flex justify-between items-center bg-gray-700 px-2 py-1 rounded';
-                        row.innerHTML = `<span>${name}</span><span class="font-bold">${count}</span>`;
+                        // Compute per-item water output for this line (qty-aware) with unit based on item
+                        const item = allItems.find(i => i.Name === name);
+                        let waterText = '';
+                        if (item && typeof item.WaterPerMinute === 'number' && item.WaterPerMinute > 0) {
+                            const nm = (item.Name || '').toLowerCase();
+                            if (nm.includes('windtrap')) {
+                                const lpm = item.WaterPerMinute * count;
+                                const s = Math.abs(lpm - Math.round(lpm)) < 0.05 ? Math.round(lpm).toLocaleString() : lpm.toFixed(1);
+                                waterText = `<span class="text-xs text-blue-300">💧 ${s} L/min</span>`;
+                            } else if (nm.includes('deathstill')) {
+                                const lph = item.WaterPerMinute * 60 * count;
+                                const s = Math.abs(lph - Math.round(lph)) < 0.05 ? Math.round(lph).toLocaleString() : lph.toFixed(1);
+                                waterText = `<span class="text-xs text-blue-300">💧 ${s} L/hour</span>`;
+                            }
+                        }
+                        row.innerHTML = `<div class="flex flex-col"><span>${name}</span>${waterText}</div><span class="flex items-center gap-2"><span class="font-bold">${count}</span><button class="btn btn-secondary py-1 px-2 text-xs edit-count" data-name="${name}">✏️</button></span>`;
+                        row.querySelector('.edit-count').addEventListener('click', () => {
+                            const current = selectedItems[name] || 0;
+                            const val = prompt(`Set quantity for ${name}:`, String(current));
+                            if (val === null) return;
+                            const n = Math.max(0, parseInt(val, 10) || 0);
+                            if (n === 0) delete selectedItems[name]; else selectedItems[name] = n;
+                            updateMaterialsList();
+                            displayItems();
+                        });
                         dom.selectedItemsList.appendChild(row);
                     });
                 }
@@ -531,6 +653,17 @@
                     const row = document.createElement('div');
                     row.className = 'flex justify-between items-center bg-gray-700 px-2 py-1 rounded';
                     row.innerHTML = `<span>Apartments</span><span class="font-bold">${apartmentConfig.apartments}</span>`;
+                    dom.selectedItemsList.appendChild(row);
+                }
+
+                // Append Pentashield summary if set
+                if ((pentashieldConfig.entries || []).length > 0) {
+                    const row = document.createElement('div');
+                    row.className = 'flex justify-between items-center bg-gray-700 px-2 py-1 rounded';
+                    const totals = calcPentTotals();
+                    const desc = `Pentashields x${totals.count} (Squares: ${totals.squares}, Power: -${totals.draw})`;
+                    row.innerHTML = `<span>${desc}</span><span class="flex items-center gap-2"><button class="btn btn-secondary py-1 px-2 text-xs edit-pent">✏️</button></span>`;
+                    row.querySelector('.edit-pent').addEventListener('click', openPentashieldModal);
                     dom.selectedItemsList.appendChild(row);
                 }
 
@@ -556,6 +689,16 @@
                     consumes += c * count;
                 });
 
+                // Pentashield special consumption: per-entry (vertical:6, horizontal:3) * squares
+                if (pentashieldConfig && Array.isArray(pentashieldConfig.entries)) {
+                    const extra = pentashieldConfig.entries.reduce((sum, e) => {
+                        const sq = Math.max(0, parseInt(e?.squares, 10) || 0);
+                        const per = (String(e?.orientation).toLowerCase() === 'horizontal') ? 3 : 6;
+                        return sum + (sq * per);
+                    }, 0);
+                    consumes += extra;
+                }
+
                 dom.powerAvailable.textContent = provides;
                 dom.powerUsed.textContent = consumes;
                 const balance = provides - consumes;
@@ -574,17 +717,40 @@
             function updateWater() {
                 // Sum water capacities from selected items. If none have capacity, keep zero.
                 let totalL = 0;
+                // Also compute production totals (windtraps L/min, deathstills L/hour)
+                let windtrapLpm = 0;
+                let deathstillLph = 0;
                 Object.entries(selectedItems).forEach(([itemName, count]) => {
                     const item = allItems.find(i => i.Name === itemName);
                     if (!item || count <= 0) return;
                     const cap = (typeof item.WaterCapacity === 'number') ? item.WaterCapacity : 0;
                     if (cap > 0) totalL += cap * count;
+
+                    const rate = (typeof item.WaterPerMinute === 'number') ? item.WaterPerMinute : 0;
+                    if (rate > 0) {
+                        const nm = (item.Name || '').toLowerCase();
+                        if (nm.includes('windtrap')) {
+                            windtrapLpm += rate * count;
+                        } else if (nm.includes('deathstill')) {
+                            deathstillLph += rate * 60 * count; // convert to L/hour
+                        }
+                    }
                 });
                 dom.waterCapacity.textContent = totalL.toLocaleString();
                 // Blue bar: normalize vs a soft cap for visualization. Use max of 10,000L or total.
                 const denom = Math.max(10000, totalL, 1);
                 const pct = Math.min(100, Math.round((totalL / denom) * 100));
                 dom.waterBar.style.width = `${pct}%`;
+
+                // Update production totals
+                if (dom.waterWindtrapLpm) {
+                    const isInt = Math.abs(windtrapLpm - Math.round(windtrapLpm)) < 0.05;
+                    dom.waterWindtrapLpm.textContent = isInt ? Math.round(windtrapLpm).toLocaleString() : windtrapLpm.toFixed(1);
+                }
+                if (dom.waterDeathstillLph) {
+                    const isInt = Math.abs(deathstillLph - Math.round(deathstillLph)) < 0.05;
+                    dom.waterDeathstillLph.textContent = isInt ? Math.round(deathstillLph).toLocaleString() : deathstillLph.toFixed(1);
+                }
             }
 
             function updateDeepDesertButtonState() {
@@ -595,38 +761,89 @@
 
             function renderConsumablesList() {
                 if (!dom.consumablesList) return;
-                // Aggregate required consumables to run selected equipment for targetDays
-                const totals = {};
+                // Find selected equipment with consumable options
                 const equip = Object.entries(selectedItems)
                     .map(([name, count]) => ({ name, count, item: allItems.find(i => i.Name === name) }))
                     .filter(x => x.item && x.count > 0 && Array.isArray(x.item.Consumables) && x.item.Consumables.length > 0);
 
-                equip.forEach(({ count, item }) => {
-                    const options = (item.Consumables || []).filter(c => c && c.Name);
-                    if (options.length === 0) return;
-                    // choose the option with the largest Hours (most efficient)
-                    const best = options.reduce((a,b) => (a.Hours||0) >= (b.Hours||0) ? a : b);
-                    const hoursNeeded = (targetDays * 24) * count;
-                    const hoursPerUnit = Math.max(0.001, best.Hours || 1);
-                    const units = Math.ceil(hoursNeeded / hoursPerUnit);
-                    totals[best.Name] = (totals[best.Name] || 0) + units;
-                });
-
-                const entries = Object.entries(totals).sort((a,b) => a[0].localeCompare(b[0]));
-                if (entries.length === 0) {
+                if (equip.length === 0) {
                     dom.consumablesList.innerHTML = '<p class="text-gray-500">No consumables required for the currently selected items.</p>';
                     return;
                 }
-                dom.consumablesList.innerHTML = '';
-                entries.forEach(([name, qty]) => {
+
+                equip.sort((a,b) => a.name.localeCompare(b.name));
+                const container = document.createElement('div');
+                container.className = 'space-y-2';
+
+                // Equipment rows with consumable picker
+                equip.forEach(({ name, count, item }) => {
+                    const options = (item.Consumables || []).filter(c => c && c.Name);
+                    if (options.length === 0) return;
+                    const validNames = new Set(options.map(o => o.Name));
+                    if (!consumableChoice[name] || !validNames.has(consumableChoice[name])) {
+                        const best = options.reduce((a,b) => (a.Hours||0) >= (b.Hours||0) ? a : b);
+                        consumableChoice[name] = best.Name;
+                    }
                     const row = document.createElement('div');
                     row.className = 'flex items-center justify-between bg-gray-700 p-2 rounded';
-                    row.innerHTML = `
-                        <span class="font-semibold">${name}</span>
-                        <span class="font-bold text-d4ac0d">${qty.toLocaleString()}</span>
-                    `;
-                    dom.consumablesList.appendChild(row);
+                    const left = document.createElement('div');
+                    left.className = 'font-semibold';
+                    left.textContent = `${name} x${count}`;
+                    const right = document.createElement('div');
+                    if (options.length > 1) {
+                        const sel = document.createElement('select');
+                        sel.className = 'bg-gray-700 border border-gray-600 rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-d4ac0d';
+                        sel.setAttribute('data-equip', name);
+                        options.forEach(opt => {
+                            const o = document.createElement('option');
+                            o.value = opt.Name;
+                            o.textContent = `${opt.Name} (${(opt.Hours || 0)}h)`;
+                            if (opt.Name === consumableChoice[name]) o.selected = true;
+                            sel.appendChild(o);
+                        });
+                        right.appendChild(sel);
+                    } else {
+                        right.innerHTML = `<span class="text-gray-300">${options[0].Name} (${(options[0].Hours || 0)}h)</span>`;
+                        consumableChoice[name] = options[0].Name;
+                    }
+                    row.appendChild(left);
+                    row.appendChild(right);
+                    container.appendChild(row);
                 });
+
+                // Divider
+                const divider = document.createElement('div');
+                divider.className = 'border-t border-gray-700 my-2';
+                container.appendChild(divider);
+
+                // Totals based on chosen consumables
+                const totals = {};
+                equip.forEach(({ name, count, item }) => {
+                    const chosen = consumableChoice[name];
+                    const match = (item.Consumables || []).find(c => c && c.Name === chosen);
+                    if (!match) return;
+                    const hoursNeeded = (targetDays * 24) * count;
+                    const hoursPerUnit = Math.max(0.001, match.Hours || 1);
+                    const units = Math.ceil(hoursNeeded / hoursPerUnit);
+                    totals[match.Name] = (totals[match.Name] || 0) + units;
+                });
+                const entries = Object.entries(totals).sort((a,b) => a[0].localeCompare(b[0]));
+                if (entries.length === 0) {
+                    const p = document.createElement('p');
+                    p.className = 'text-gray-500';
+                    p.textContent = 'No consumables required for the currently selected items.';
+                    container.appendChild(p);
+                } else {
+                    entries.forEach(([cname, qty]) => {
+                        const row = document.createElement('div');
+                        row.className = 'flex items-center justify-between bg-gray-700 p-2 rounded';
+                        row.innerHTML = `<span class="font-semibold">${cname}</span><span class="font-bold text-d4ac0d">${qty.toLocaleString()}</span>`;
+                        container.appendChild(row);
+                    });
+                }
+
+                dom.consumablesList.innerHTML = '';
+                dom.consumablesList.appendChild(container);
             }
 
             
@@ -635,7 +852,9 @@
             function resetCalculator() {
                 selectedItems = {};
                 // keep targetDays as user set
+                consumableChoice = {};
                 apartmentConfig = { apartments: 0, per: { "Plastone": 0, "Granite": 0, "Salvaged Metal": 0, "Iron": 0, "Agave Seeds": 0 } };
+                pentashieldConfig = { count: 0, squares: 0 };
                 if(allItems.length > 0) {
                     displayItems();
                 }
@@ -684,18 +903,126 @@
                 dom.apartmentModal.classList.replace('flex', 'hidden');
             }
 
+            function openPentashieldModal() {
+                pentWorking = (pentashieldConfig && Array.isArray(pentashieldConfig.entries)) ? JSON.parse(JSON.stringify(pentashieldConfig.entries)) : [];
+                renderPentashieldEditor();
+                dom.pentashieldModal.classList.replace('hidden', 'flex');
+            }
+
+            function renderPentashieldEditor() {
+                if (!dom.pentRows) return;
+                dom.pentRows.innerHTML = '';
+                const entries = pentWorking || [];
+                let totalSquares = 0, totalDraw = 0;
+                entries.forEach((e, idx) => {
+                    const per = (String(e?.orientation).toLowerCase() === 'horizontal') ? 3 : 6;
+                    const sq = Math.max(0, parseInt(e?.squares, 10) || 0);
+                    totalSquares += sq;
+                    totalDraw += (sq * per);
+                    const row = document.createElement('div');
+                    row.className = 'grid grid-cols-12 gap-2 items-center bg-gray-700 p-2 rounded';
+                    row.innerHTML = `
+                        <div class="col-span-5">
+                            <label class="text-xs text-gray-300">Orientation</label>
+                            <select data-idx="${idx}" data-field="orientation" class="w-full bg-gray-700 border border-gray-600 rounded-md p-1">
+                                <option value="vertical" ${e.orientation==='vertical'?'selected':''}>Vertical (6/sq)</option>
+                                <option value="horizontal" ${e.orientation==='horizontal'?'selected':''}>Horizontal (3/sq)</option>
+                            </select>
+                        </div>
+                        <div class="col-span-4">
+                            <label class="text-xs text-gray-300"># Squares</label>
+                            <input data-idx="${idx}" data-field="squares" type="number" min="0" value="${sq}" class="w-full bg-gray-700 border border-gray-600 rounded-md p-1" />
+                        </div>
+                        <div class="col-span-2 text-sm text-gray-200 pent-row-power" data-idx="${idx}">Power: -${sq*per}</div>
+                        <div class="col-span-1 flex justify-end"><button data-idx="${idx}" class="btn btn-secondary py-1 px-2 text-xs pent-remove">✖</button></div>
+                    `;
+                    dom.pentRows.appendChild(row);
+                });
+                if (dom.pentSummary) dom.pentSummary.textContent = `Total: ${entries.length} units, ${totalSquares} squares, Power: -${totalDraw}`;
+            }
+
+            function handlePentashieldRowInput(e) {
+                const idx = parseInt(e.target.getAttribute('data-idx'), 10);
+                const field = e.target.getAttribute('data-field');
+                if (isNaN(idx) || !field) return;
+                if (!pentWorking || !pentWorking[idx]) return;
+                if (field === 'orientation') pentWorking[idx].orientation = e.target.value === 'horizontal' ? 'horizontal' : 'vertical';
+                if (field === 'squares') pentWorking[idx].squares = Math.max(0, parseInt(e.target.value, 10) || 0);
+                // Update only the changed row's power and the summary; avoid re-render to preserve focus
+                updatePentashieldRowPower(idx);
+                updatePentashieldSummary();
+            }
+
+            function handlePentashieldRowClick(e) {
+                const btn = e.target.closest('.pent-remove');
+                if (!btn) return;
+                const idx = parseInt(btn.getAttribute('data-idx'), 10);
+                if (isNaN(idx)) return;
+                if (!pentWorking) return;
+                pentWorking.splice(idx, 1);
+                renderPentashieldEditor();
+            }
+
+            function applyPentashieldPlan() {
+                pentashieldConfig = { entries: Array.isArray(pentWorking) ? pentWorking.map(e => ({ orientation: (e.orientation==='horizontal'?'horizontal':'vertical'), squares: Math.max(0, parseInt(e.squares, 10) || 0) })) : [] };
+                try {
+                    updateMaterialsList();
+                    updatePower();
+                } finally {
+                    // Always close even if an update throws
+                    dom.pentashieldModal.classList.replace('flex', 'hidden');
+                }
+            }
+
+            // Helper: compute Pentashield totals from saved config
+            function calcPentTotals() {
+                const entries = (pentashieldConfig && Array.isArray(pentashieldConfig.entries)) ? pentashieldConfig.entries : [];
+                let squares = 0; let draw = 0; const count = entries.length;
+                entries.forEach(e => {
+                    const sq = Math.max(0, parseInt(e?.squares, 10) || 0);
+                    const per = (String(e?.orientation).toLowerCase() === 'horizontal') ? 3 : 6;
+                    squares += sq;
+                    draw += sq * per;
+                });
+                return { count, squares, draw };
+            }
+
+            function updatePentashieldSummary() {
+                if (!dom.pentSummary) return;
+                const entries = pentWorking || [];
+                let totalSquares = 0, totalDraw = 0;
+                entries.forEach(e => {
+                    const sq = Math.max(0, parseInt(e?.squares, 10) || 0);
+                    const per = (String(e?.orientation).toLowerCase() === 'horizontal') ? 3 : 6;
+                    totalSquares += sq;
+                    totalDraw += sq * per;
+                });
+                dom.pentSummary.textContent = `Total: ${entries.length} units, ${totalSquares} squares, Power: -${totalDraw}`;
+            }
+
+            function updatePentashieldRowPower(idx) {
+                const e = pentWorking && pentWorking[idx];
+                if (!e) return;
+                const per = (String(e?.orientation).toLowerCase() === 'horizontal') ? 3 : 6;
+                const sq = Math.max(0, parseInt(e?.squares, 10) || 0);
+                const el = dom.pentRows && dom.pentRows.querySelector(`.pent-row-power[data-idx="${idx}"]`);
+                if (el) el.textContent = `Power: -${sq * per}`;
+            }
+
             // --- Data File Management ---
             // (upload removed; JSON auto-loads if present)
 
             // --- Export / Import State ---
-            function getExportState() {
+        function getExportState() {
                 return {
                     version: 1,
                     savedAt: new Date().toISOString(),
                     deepDesertEnabled,
                     targetDays,
                     selectedItems,
-                    apartmentConfig
+                    consumableChoice,
+            apartmentConfig,
+            pentashieldConfig
                 };
             }
 
@@ -764,6 +1091,10 @@
                             if (n > 0) selectedItems[k] = n;
                         }
                     }
+                    // Consumable choices
+                    if (data.consumableChoice && typeof data.consumableChoice === 'object') {
+                        consumableChoice = { ...data.consumableChoice };
+                    }
                     // Apartments
                     if (data.apartmentConfig && typeof data.apartmentConfig === 'object') {
                         const a = data.apartmentConfig;
@@ -784,6 +1115,23 @@
                         dom.aptSalvaged.value = String(apartmentConfig.per['Salvaged Metal'] || 0);
                         dom.aptIron.value = String(apartmentConfig.per['Iron'] || 0);
                         dom.aptAgave.value = String(apartmentConfig.per['Agave Seeds'] || 0);
+                    }
+                    // Pentashield (supports legacy {count,squares})
+                    if (data.pentashieldConfig && typeof data.pentashieldConfig === 'object') {
+                        const p = data.pentashieldConfig;
+                        if (Array.isArray(p.entries)) {
+                            pentashieldConfig = { entries: p.entries.map(e => ({ orientation: (String(e.orientation).toLowerCase()==='horizontal'?'horizontal':'vertical'), squares: Math.max(0, parseInt(e.squares, 10) || 0) })) };
+                        } else {
+                            const count = Math.max(0, parseInt(p.count, 10) || 0);
+                            const squares = Math.max(0, parseInt(p.squares, 10) || 0);
+                            if (count > 0) {
+                                const per = Math.floor(squares / Math.max(1, count));
+                                const entries = Array.from({length: count}, (_, i) => ({ orientation: 'vertical', squares: i === count - 1 ? (squares - per*(count-1)) : per }));
+                                pentashieldConfig = { entries };
+                            } else {
+                                pentashieldConfig = { entries: [] };
+                            }
+                        }
                     }
 
                     // Refresh UI

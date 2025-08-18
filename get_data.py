@@ -27,13 +27,35 @@ def merge_manual_items(items):
                 {"Name": "Steel", "Count": 2},
                 {"Name": "Cobalt Paste", "Count": 20},
             ],
-            "Power": {"Provides": 0, "Consumes": 6},
+            # Power consumption for Pentashield is set via UI using total squares; keep 0 here to avoid double counting.
+            "Power": {"Provides": 0, "Consumes": 0},
             "WaterCapacity": 0,
-        }
+        },
+        {
+            "Name": "Fuel Generator",
+            "Recipe": [
+                {"Name": "Salvaged Metal", "Count": 45},
+            ],
+            "Power": {"Provides": 75, "Consumes": 0},
+            "WaterCapacity": 0,
+            "Consumables": [
+                {"Name": "Fuel Cells", "Hours": 501.0/500.0}
+            ]
+        },
     ]
     by_name = {i.get("Name"): i for i in items}
     for m in manual:
         by_name[m["Name"]] = m
+
+    # Normalize and hard-code water rates for Deathstills (wiki lacks explicit L/min)
+    # Advanced Fremen Deathstill: 45 liters per 50 minutes -> 0.9 L/min
+    # Fremen Deathstill: 25 liters per 60 minutes -> 25/60 ≈ 0.416666... L/min
+    ADV_LPM = 45.0 / 50.0
+    STD_LPM = 25.0 / 60.0
+    if "Advanced Fremen Deathstill" in by_name:
+        by_name["Advanced Fremen Deathstill"]["WaterPerMinute"] = ADV_LPM
+    if "Fremen Deathstill" in by_name:
+        by_name["Fremen Deathstill"]["WaterPerMinute"] = STD_LPM
     return list(by_name.values())
 
 def get_placeable_links(url):
@@ -250,18 +272,123 @@ def parse_water_capacity_from_page(soup):
     return int(capacity_l or 0)
 
 
+def _parse_water_rate(text: str):
+    """Parse water production rate from text and return liters per minute (float) if found.
+    Supports units like L/min, liters per minute, L/h, L/s, ml/min. If only a number is present,
+    the caller should decide whether it implies L/min (handled in parse_water_rate_from_page).
+    """
+    if not text:
+        return None
+    t = text.strip().lower()
+    # Normalize unicode and spacing
+    t = re.sub(r"\s+", " ", t)
+
+    # Helpers
+    def _to_float(x):
+        try:
+            return float(x)
+        except Exception:
+            return None
+
+    # Common patterns
+    # e.g., 12 L/min, 12L/min, 12 liters per minute
+    m = re.search(r"(\d+[\d\.,]*)\s*(?:l\/min|l per min|liters\/min|liters per minute|litres per minute|lpm)\b", t)
+    if m:
+        num = m.group(1).replace(",", "")
+        return _to_float(num)
+
+    # Liters per hour -> convert to per minute
+    m = re.search(r"(\d+[\d\.,]*)\s*(?:l\/h|l per hour|liters per hour|litres per hour|lph)\b", t)
+    if m:
+        num = m.group(1).replace(",", "")
+        v = _to_float(num)
+        return (v / 60.0) if v is not None else None
+
+    # Liters per second -> convert to per minute
+    m = re.search(r"(\d+[\d\.,]*)\s*(?:l\/s|l per second|liters per second|litres per second|lps)\b", t)
+    if m:
+        num = m.group(1).replace(",", "")
+        v = _to_float(num)
+        return (v * 60.0) if v is not None else None
+
+    # Milliliters per minute -> convert to L/min
+    m = re.search(r"(\d+[\d\.,]*)\s*(?:ml\/min|milliliters per minute|millilitres per minute)\b", t)
+    if m:
+        num = m.group(1).replace(",", "")
+        v = _to_float(num)
+        return (v or 0) / 1000.0
+
+    return None
+
+
+def parse_water_rate_from_page(soup):
+    """Parse water generation rate (liters per minute) for items like Windtrap/Deathstill.
+    Returns a float liters/minute, or 0.0 if not found.
+    """
+    rate_lpm = 0.0
+
+    LABELS = [
+        "water production", "water generated", "water output", "water generation",
+        "water per minute", "production (water)", "water rate", "water (per min)",
+        "water gather rate", "gather rate", "gathering rate", "gather",
+    ]
+
+    # Table-based search
+    for row in soup.find_all('tr'):
+        tds = row.find_all('td')
+        label_el = row.find('th') or (tds[0] if len(tds) >= 2 else None)
+        value_el = (tds[1] if len(tds) >= 2 else (tds[0] if len(tds) == 1 and row.find('th') else None))
+        if not label_el or not value_el:
+            continue
+        label = (label_el.get_text(" ", strip=True) or '').lower()
+        if any(k in label for k in LABELS) or ("water" in label and ("/min" in label or "per minute" in label or "gather" in label)):
+            val_text = value_el.get_text(" ", strip=True)
+            v = _parse_water_rate(val_text)
+            if v is None:
+                # Fallback: plain number implies L/min for gather rate contexts
+                m = re.search(r"(\d+[\d\.,]*)", val_text)
+                if m:
+                    try:
+                        v = float(m.group(1).replace(",", ""))
+                    except Exception:
+                        v = None
+            if v is not None:
+                rate_lpm = max(rate_lpm, float(v))
+
+    if rate_lpm == 0:
+        # Text-based fallback search across the page
+        txt = soup.get_text(" ", strip=True)
+        v = _parse_water_rate(txt)
+        if v is not None:
+            rate_lpm = max(rate_lpm, v)
+
+    print(f"[water-rate] lpm={rate_lpm}")
+    return float(rate_lpm or 0.0)
+
+
 def _parse_hours(text: str):
     """Parse a duration string like '1h', '2 hours', '30m' into hours (float)."""
     if not text:
         return None
     t = text.strip().lower()
-    # minutes first
-    m = re.search(r"(\d+(?:\.\d+)?)\s*(?:m|min|mins|minute|minutes)\b", t)
-    if m:
-        return float(m.group(1)) / 60.0
-    m = re.search(r"(\d+(?:\.\d+)?)\s*(?:h|hr|hrs|hour|hours)\b", t)
-    if m:
-        return float(m.group(1))
+    # Combined formats: days/hours/minutes (any order typical), e.g., '1 day 2 hours 30 minutes', '1h 30m'
+    days = 0.0
+    hours = 0.0
+    minutes = 0.0
+    md = re.search(r"(\d+(?:\.\d+)?)\s*(?:d|day|days)\b", t)
+    if md:
+        days = float(md.group(1))
+    mh = re.search(r"(\d+(?:\.\d+)?)\s*(?:h|hr|hrs|hour|hours)\b", t)
+    if mh:
+        hours = float(mh.group(1))
+    mm = re.search(r"(\d+(?:\.\d+)?)\s*(?:m|min|mins|minute|minutes)\b", t)
+    if mm:
+        minutes = float(mm.group(1))
+    # If any of them matched, compute total
+    if md or mh or mm:
+        return days * 24.0 + hours + (minutes / 60.0)
+
+    # Fallbacks: compact or single tokens
     # compact like x1h or 1h without space
     m = re.search(r"x\s*(\d+(?:\.\d+)?)\s*h\b", t)
     if m:
@@ -269,6 +396,9 @@ def _parse_hours(text: str):
     m = re.search(r"(\d+(?:\.\d+)?)h\b", t)
     if m:
         return float(m.group(1))
+    m = re.search(r"(\d+(?:\.\d+)?)m\b", t)
+    if m:
+        return float(m.group(1)) / 60.0
     return None
 
 
@@ -618,8 +748,9 @@ def scrape_recipe_from_page(url):
 
         power = parse_power_from_page(soup)
         water_capacity = parse_water_capacity_from_page(soup)
+        water_rate_lpm = parse_water_rate_from_page(soup)
         consumables = parse_consumables_from_page(soup)
-        return {"Recipe": recipe, "Power": power, "WaterCapacity": water_capacity, "Consumables": consumables}
+        return {"Recipe": recipe, "Power": power, "WaterCapacity": water_capacity, "WaterPerMinute": water_rate_lpm, "Consumables": consumables}
 
     except requests.exceptions.RequestException as e:
         print(f"[page] ERROR: Could not scrape page {url}: {e}")
@@ -652,6 +783,7 @@ def main():
                         "Recipe": result.get("Recipe", []),
                         "Power": result.get("Power", {"Provides": 0, "Consumes": 0}),
                         "WaterCapacity": int(result.get("WaterCapacity", 0)),
+                        "WaterPerMinute": float(result.get("WaterPerMinute", 0) or 0),
                         "Consumables": result.get("Consumables", [])
                     }
                     all_item_data.append(item_data)
