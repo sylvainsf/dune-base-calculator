@@ -406,11 +406,69 @@ def parse_consumables_from_page(soup):
     """Parse consumables for equipment: list of {Name, Hours}.
     Looks for table rows labeled Consumable(s)/Fuel/Lubricant/Upkeep and extracts names and hours.
     """
+    # Helper: determine if a table is under a Crafting/Recipes section
+    def _is_in_recipes_section(tbl):
+        # Check nearest previous section heading
+        prev_head = tbl.find_previous(["h2", "h3", "h4"]) if tbl else None
+        head_text = (prev_head.get_text(" ", strip=True).lower() if prev_head else "")
+        if any(k in head_text for k in ("recipe", "recipes", "craft", "crafting")):
+            return True
+        # Check caption text if present
+        cap = tbl.find("caption") if tbl else None
+        cap_text = (cap.get_text(" ", strip=True).lower() if cap else "")
+        if any(k in cap_text for k in ("recipe", "recipes",)):
+            return True
+        return False
+
+    # Collect names of products from any Recipes/Crafting tables to exclude them from consumables
+    recipe_products = set()
+    for tbl in soup.find_all('table'):
+        if not _is_in_recipes_section(tbl):
+            continue
+        # Try to identify the products column by header name
+        header_cells = []
+        first_tr = tbl.find('tr')
+        if first_tr:
+            header_cells = first_tr.find_all('th')
+        product_col_idx = None
+        for idx, th in enumerate(header_cells or []):
+            if 'product' in (th.get_text(' ', strip=True).lower()):
+                product_col_idx = idx
+                break
+        # Fallback: many recipes tables have two columns -> second is products
+        # We'll assume index 1 when exactly two columns per data row
+        for row in tbl.find_all('tr'):
+            tds = row.find_all('td')
+            if not tds:
+                continue
+            if product_col_idx is not None and len(tds) > product_col_idx:
+                prod_cell = tds[product_col_idx]
+            elif len(tds) == 2:
+                prod_cell = tds[1]
+            else:
+                continue
+            for a in prod_cell.find_all('a'):
+                href = (a.get('href') or '')
+                title = (a.get('title') or '').strip()
+                text = (a.get_text(' ', strip=True) or '').strip()
+                if href.startswith('/File:') or href.startswith('/Category:'):
+                    continue
+                nm = text or title
+                if nm:
+                    recipe_products.add(nm)
+
     results = []
     # Table-based: handle row-wise labeling and explicit two-column headers
     for tbl in soup.find_all('table'):
+        # Skip tables in Crafting/Recipes sections; they list produced items, not consumables
+        if _is_in_recipes_section(tbl):
+            continue
         headers = [th.get_text(' ', strip=True).lower() for th in tbl.find_all('th')]
-        looks_like_consumable_table = any('consumable' in h or 'fuel' in h or 'lubricant' in h for h in headers) and any('burn' in h or 'time' in h or 'duration' in h for h in headers)
+        # Stricter detection: require a name-ish column indicating consumable/fuel/lubricant and a time-ish column
+        looks_like_consumable_table = (
+            any(h for h in headers if any(k in h for k in ('consumable', 'consumables', 'fuel', 'lubricant', 'upkeep', 'maintenance'))) and
+            any(h for h in headers if any(k in h for k in ('burn', 'time', 'duration')))
+        )
         for row in tbl.find_all('tr'):
             ths = row.find_all('th')
             tds = row.find_all('td')
@@ -499,6 +557,9 @@ def parse_consumables_from_page(soup):
     # De-dup by Name, keep max hours found
     by_name = {}
     for r in results:
+        # Drop anything that appears to be a crafted Product from a Recipes table
+        if r["Name"] in recipe_products:
+            continue
         prev = by_name.get(r["Name"])
         if not prev or r["Hours"] > prev["Hours"]:
             by_name[r["Name"]] = r

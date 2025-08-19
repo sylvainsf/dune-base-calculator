@@ -181,12 +181,7 @@
         },
         "WaterCapacity": 0,
         "WaterPerMinute": 0.0,
-        "Consumables": [
-            {
-                "Name": "Missile",
-                "Hours": 1.0
-            }
-        ]
+        "Consumables": []
     },
     {
         "Name": "Blood Purifier",
@@ -463,32 +458,7 @@
         },
         "WaterCapacity": 0,
         "WaterPerMinute": 0.0,
-        "Consumables": [
-            {
-                "Name": "Medium Sized Vehicle Fuel Cell",
-                "Hours": 1.0
-            },
-            {
-                "Name": "Large Vehicle Fuel Cell",
-                "Hours": 1.0
-            },
-            {
-                "Name": "Industrial-grade Lubricant",
-                "Hours": 1.0
-            },
-            {
-                "Name": "Low-grade Lubricant",
-                "Hours": 1.0
-            },
-            {
-                "Name": "Small Vehicle Fuel Cell",
-                "Hours": 1.0
-            },
-            {
-                "Name": "Spice-infused Fuel Cell",
-                "Hours": 1.0
-            }
-        ]
+        "Consumables": []
     },
     {
         "Name": "Medium Ore Refinery",
@@ -636,24 +606,7 @@
         },
         "WaterCapacity": 0,
         "WaterPerMinute": 0.0,
-        "Consumables": [
-            {
-                "Name": "Small Vehicle Fuel Cell",
-                "Hours": 1.0
-            },
-            {
-                "Name": "Medium Sized Vehicle Fuel Cell",
-                "Hours": 1.0
-            },
-            {
-                "Name": "Low-grade Lubricant",
-                "Hours": 1.0
-            },
-            {
-                "Name": "Industrial-grade Lubricant",
-                "Hours": 1.0
-            }
-        ]
+        "Consumables": []
     },
     {
         "Name": "Small Ore Refinery",
@@ -850,16 +803,7 @@
         },
         "WaterCapacity": 0,
         "WaterPerMinute": 0.0,
-        "Consumables": [
-            {
-                "Name": "Incendiary Gel",
-                "Hours": 1.0
-            },
-            {
-                "Name": "Rocket",
-                "Hours": 1.0
-            }
-        ]
+        "Consumables": []
     },
     {
         "Name": "Wind Turbine Directional",
@@ -979,14 +923,24 @@
         "WaterCapacity": 0
     },
     {
-        "Name": "Missile",
-        "Recipe": [],
+        "Name": "Fuel Generator",
+        "Recipe": [
+            {
+                "Name": "Salvaged Metal",
+                "Count": 45
+            }
+        ],
         "Power": {
-            "Provides": 0,
+            "Provides": 75,
             "Consumes": 0
         },
         "WaterCapacity": 0,
-        "IsConsumable": true
+        "Consumables": [
+            {
+                "Name": "Fuel Cells",
+                "Hours": 1.002
+            }
+        ]
     },
     {
         "Name": "Particulate Filter",
@@ -1009,17 +963,7 @@
         "IsConsumable": true
     },
     {
-        "Name": "Medium Sized Vehicle Fuel Cell",
-        "Recipe": [],
-        "Power": {
-            "Provides": 0,
-            "Consumes": 0
-        },
-        "WaterCapacity": 0,
-        "IsConsumable": true
-    },
-    {
-        "Name": "Large Vehicle Fuel Cell",
+        "Name": "Spice-infused Fuel Cell",
         "Recipe": [],
         "Power": {
             "Provides": 0,
@@ -1049,46 +993,6 @@
         "IsConsumable": true
     },
     {
-        "Name": "Small Vehicle Fuel Cell",
-        "Recipe": [],
-        "Power": {
-            "Provides": 0,
-            "Consumes": 0
-        },
-        "WaterCapacity": 0,
-        "IsConsumable": true
-    },
-    {
-        "Name": "Spice-infused Fuel Cell",
-        "Recipe": [],
-        "Power": {
-            "Provides": 0,
-            "Consumes": 0
-        },
-        "WaterCapacity": 0,
-        "IsConsumable": true
-    },
-    {
-        "Name": "Incendiary Gel",
-        "Recipe": [],
-        "Power": {
-            "Provides": 0,
-            "Consumes": 0
-        },
-        "WaterCapacity": 0,
-        "IsConsumable": true
-    },
-    {
-        "Name": "Rocket",
-        "Recipe": [],
-        "Power": {
-            "Provides": 0,
-            "Consumes": 0
-        },
-        "WaterCapacity": 0,
-        "IsConsumable": true
-    },
-    {
         "Name": "Makeshift Filter",
         "Recipe": [],
         "Power": {
@@ -1107,26 +1011,6 @@
         },
         "WaterCapacity": 0,
         "IsConsumable": true
-    },
-    {
-        "Name": "Fuel Generator",
-        "Recipe": [
-            {
-                "Name": "Salvaged Metal",
-                "Count": 45
-            }
-        ],
-        "Power": {
-            "Provides": 75,
-            "Consumes": 0
-        },
-        "WaterCapacity": 0,
-        "Consumables": [
-            {
-                "Name": "Fuel Cells",
-                "Hours": 1.002
-            }
-        ]
     },
     {
         "Name": "Fuel Cells",
