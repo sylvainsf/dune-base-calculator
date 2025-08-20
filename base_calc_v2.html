@@ -537,8 +537,7 @@
                     const waterRate = typeof item.WaterPerMinute === 'number' && item.WaterPerMinute > 0 ? item.WaterPerMinute : null;
                     const waterStr = (v) => {
                         if (v == null) return '';
-                        const isInt = Math.abs(v - Math.round(v)) < 0.05;
-                        return isInt ? Math.round(v).toLocaleString() : v.toFixed(1);
+                        return Math.ceil(v).toLocaleString();
                     };
                     let extraLine = '';
                     if (waterRate) {
@@ -626,11 +625,11 @@
                             const nm = (item.Name || '').toLowerCase();
                             if (nm.includes('windtrap')) {
                                 const lpm = item.WaterPerMinute * count;
-                                const s = Math.abs(lpm - Math.round(lpm)) < 0.05 ? Math.round(lpm).toLocaleString() : lpm.toFixed(1);
+                                const s = Math.ceil(lpm).toLocaleString();
                                 waterText = `<span class="text-xs text-blue-300">💧 ${s} L/min</span>`;
                             } else if (nm.includes('deathstill')) {
                                 const lph = item.WaterPerMinute * 60 * count;
-                                const s = Math.abs(lph - Math.round(lph)) < 0.05 ? Math.round(lph).toLocaleString() : lph.toFixed(1);
+                                const s = Math.ceil(lph).toLocaleString();
                                 waterText = `<span class="text-xs text-blue-300">💧 ${s} L/hour</span>`;
                             }
                         }
@@ -744,12 +743,10 @@
 
                 // Update production totals
                 if (dom.waterWindtrapLpm) {
-                    const isInt = Math.abs(windtrapLpm - Math.round(windtrapLpm)) < 0.05;
-                    dom.waterWindtrapLpm.textContent = isInt ? Math.round(windtrapLpm).toLocaleString() : windtrapLpm.toFixed(1);
+                    dom.waterWindtrapLpm.textContent = Math.ceil(windtrapLpm).toLocaleString();
                 }
                 if (dom.waterDeathstillLph) {
-                    const isInt = Math.abs(deathstillLph - Math.round(deathstillLph)) < 0.05;
-                    dom.waterDeathstillLph.textContent = isInt ? Math.round(deathstillLph).toLocaleString() : deathstillLph.toFixed(1);
+                    dom.waterDeathstillLph.textContent = Math.ceil(deathstillLph).toLocaleString();
                 }
             }
 
@@ -797,13 +794,13 @@
                         options.forEach(opt => {
                             const o = document.createElement('option');
                             o.value = opt.Name;
-                            o.textContent = `${opt.Name} (${(opt.Hours || 0)}h)`;
+                            o.textContent = `${opt.Name} (${Math.ceil(opt.Hours || 0)}h)`;
                             if (opt.Name === consumableChoice[name]) o.selected = true;
                             sel.appendChild(o);
                         });
                         right.appendChild(sel);
                     } else {
-                        right.innerHTML = `<span class="text-gray-300">${options[0].Name} (${(options[0].Hours || 0)}h)</span>`;
+                        right.innerHTML = `<span class="text-gray-300">${options[0].Name} (${Math.ceil(options[0].Hours || 0)}h)</span>`;
                         consumableChoice[name] = options[0].Name;
                     }
                     row.appendChild(left);
